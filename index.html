@@ -1,1 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Nimuri Bases</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff7fb;
+      color: #333;
+    }
+
+    header {
+      padding: 35px 20px;
+      text-align: center;
+      background: #ffffff;
+      border-bottom: 1px solid #f1dce8;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #888;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px 18px;
+    }
+
+    .search {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #e8d5df;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+      background: white;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0 25px;
+      flex-wrap: wrap;
+    }
+
+    select {
+      padding: 11px 14px;
+      border: 1px solid #e8d5df;
+      border-radius: 10px;
+      background: white;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #f0dce6;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    .owner {
+      color: #999;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .price {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 5px 9px;
+      margin: 3px;
+      border-radius: 20px;
+      background: #fff0f6;
+      color: #c05b88;
+      font-size: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 50px 10px;
+      color: #999;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🐱 Nimuri Bases</h1>
+    <p>รวม Base สำหรับใช้งาน</p>
+  </header>
+
+  <main class="container">
+
+    <input
+      id="search"
+      class="search"
+      type="text"
+      placeholder="🔎 ค้นหา Base..."
+    >
+
+    <div class="filters">
+
+      <select id="typeFilter">
+        <option value="">ทุกประเภท</option>
+        <option value="จิบิเดี่ยว">จิบิเดี่ยว</option>
+        <option value="จิบิคู่">จิบิคู่</option>
+        <option value="สเกลปกติ">สเกลปกติ</option>
+      </select>
+
+      <select id="priceFilter">
+        <option value="">ทุกช่วงราคา</option>
+        <option value="20">20฿</option>
+        <option value="30">30฿</option>
+        <option value="40">40฿</option>
+        <option value="50">50฿+</option>
+      </select>
+
+    </div>
+
+    <div id="baseList" class="grid"></div>
+
+  </main>
+
+  <script>
+
+    const bases = [
+      {
+        name: "Full body",
+        owner: "mew kotchakorn",
+        price: 20,
+        type: "จิบิเดี่ยว",
+        tags: ["จิบิเดี่ยว", "เปลี่ยนสีหน้า", "เพิ่มของถือ"]
+      },
+      {
+        name: ":33🐱",
+        owner: "mew kotchakorn",
+        price: 40,
+        type: "สเกลปกติ เดี่ยว",
+        tags: ["สเกลปกติ", "เปลี่ยนสีแมว"]
+      },
+      {
+        name: "แงง",
+        owner: "mew kotchakorn",
+        price: 20,
+        type: "จิบิเดี่ยว",
+        tags: ["จิบิเดี่ยว"]
+      }
+    ];
+
+    const list = document.getElementById("baseList");
+    const search = document.getElementById("search");
+    const typeFilter = document.getElementById("typeFilter");
+    const priceFilter = document.getElementById("priceFilter");
+
+    function render() {
+
+      const keyword = search.value.toLowerCase();
+      const type = typeFilter.value;
+      const price = priceFilter.value;
+
+      const filtered = bases.filter(base => {
+
+        const matchSearch =
+          base.name.toLowerCase().includes(keyword) ||
+          base.owner.toLowerCase().includes(keyword);
+
+        const matchType =
+          !type || base.type.includes(type);
+
+        let matchPrice = true;
+
+        if (price === "50") {
+          matchPrice = base.price >= 50;
+        } else if (price) {
+          matchPrice = base.price == Number(price);
+        }
+
+        return matchSearch && matchType && matchPrice;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML =
+          '<div class="empty">ไม่พบ Base ที่ค้นหาค่ะ 🥺</div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(base => `
+        <div class="card">
+
+          <h2>${base.name}</h2>
+
+          <div class="owner">
+            👤 ${base.owner}
+          </div>
+
+          <div class="price">
+            ${base.price}฿
+          </div>
+
+          <div>
+            ${base.tags.map(tag =>
+              `<span class="tag">${tag}</span>`
+            ).join("")}
+          </div>
+
+        </div>
+      `).join("");
+    }
+
+    search.addEventListener("input", render);
+    typeFilter.addEventListener("change", render);
+    priceFilter.addEventListener("change", render);
+
+    render();
+
+  </script>
+
+</body>
+</html>
