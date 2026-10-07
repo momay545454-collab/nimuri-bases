@@ -9,15 +9,15 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#fff7fb;color:#333}
-header{text-align:center;padding:30px 15px;background:white;border-bottom:1px solid #f1dce8}
+header{text-align:center;padding:30px 15px;background:#fff;border-bottom:1px solid #f1dce8}
 h1{margin:0;font-size:30px}
-header p{color:#888;margin:8px 0 0}
+header p{color:#888;margin:8px 0}
 main{max-width:1100px;margin:auto;padding:20px}
-input,select{padding:13px;border:1px solid #e8d5df;border-radius:10px;background:white;font-size:15px}
+input,select{padding:13px;border:1px solid #e8d5df;border-radius:10px;background:#fff;font-size:15px}
 input{width:100%}
 .filters{display:flex;gap:10px;margin:12px 0 18px;flex-wrap:wrap}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:15px}
-.card{background:white;border:1px solid #f0dce6;border-radius:15px;padding:16px;box-shadow:0 3px 12px #00000008}
+.card{background:#fff;border:1px solid #f0dce6;border-radius:15px;padding:16px}
 .card h2{margin:0 0 7px;font-size:18px}
 .owner{color:#999;font-size:13px;margin-bottom:10px}
 .price{font-size:19px;font-weight:bold;margin-bottom:8px}
@@ -43,9 +43,9 @@ input{width:100%}
 <div class="filters">
 <select id="type">
 <option value="">ทุกประเภท</option>
-<option>จิบิเดี่ยว</option>
-<option>จิบิคู่</option>
-<option>สเกลปกติ</option>
+<option value="จิบิเดี่ยว">จิบิเดี่ยว</option>
+<option value="จิบิคู่">จิบิคู่</option>
+<option value="สเกลปกติ">สเกลปกติ</option>
 </select>
 
 <select id="price">
@@ -58,9 +58,7 @@ input{width:100%}
 </div>
 
 <div id="count" class="count">กำลังโหลด...</div>
-<div id="list" class="grid">
-<div class="center">กำลังโหลด Base... 🐱</div>
-</div>
+<div id="list" class="grid"></div>
 
 </main>
 
@@ -73,56 +71,79 @@ const db=supabase.createClient(
 
 let bases=[];
 
-const $=id=>document.getElementById(id);
-const search=$("search"),type=$("type"),price=$("price");
-const list=$("list"),count=$("count");
+const search=document.getElementById("search");
+const type=document.getElementById("type");
+const price=document.getElementById("price");
+const list=document.getElementById("list");
+const count=document.getElementById("count");
 
 async function load(){
 
-const {data,error}=await db
+const result=await db
 .from("bases_with_tags")
 .select("*")
-.order("id");
+.order("id",{ascending:true});
 
-if(error){
-list.innerHTML='<div class="error">โหลดข้อมูลไม่สำเร็จค่ะ 🥺</div>';
+if(result.error){
+
+console.log(result.error);
+
+list.innerHTML=
+'<div class="error">โหลดข้อมูลไม่สำเร็จค่ะ 🥺<br>'+
+result.error.message+'</div>';
+
 count.textContent="";
 return;
 }
 
-bases=data||[];
+bases=result.data||[];
+
 render();
 }
 
 function render(){
 
-let q=search.value.toLowerCase();
-let t=type.value;
-let p=price.value;
+const q=search.value.trim().toLowerCase();
+const t=type.value;
+const p=price.value;
 
-let result=bases.filter(b=>{
+const result=bases.filter(b=>{
 
-let okSearch=
-!q||
-String(b.name).toLowerCase().includes(q)||
-String(b.owner_name).toLowerCase().includes(q);
+const name=String(b.name||"").toLowerCase();
+const owner=String(b.owner_name||"").toLowerCase();
 
-let okType=
+const searchOK=
+!q||name.includes(q)||owner.includes(q);
+
+const typeOK=
 !t||String(b.type||"").includes(t);
 
-let okPrice=
-!p||
-p==="50"
-?Number(b.price)>=50
-:Number(b.price)===Number(p);
+let priceOK=true;
 
-return okSearch&&okType&&okPrice;
+if(p==="20")
+priceOK=Number(b.price)===20;
+
+if(p==="30")
+priceOK=Number(b.price)===30;
+
+if(p==="40")
+priceOK=Number(b.price)===40;
+
+if(p==="50")
+priceOK=Number(b.price)>=50;
+
+return searchOK&&typeOK&&priceOK;
+
 });
 
-count.textContent=`พบ ${result.length} จาก ${bases.length} Base`;
+count.textContent=
+`พบ ${result.length} จาก ${bases.length} Base`;
 
 if(!result.length){
-list.innerHTML='<div class="center">ไม่พบ Base ที่ค้นหาค่ะ 🥺</div>';
+
+list.innerHTML=
+'<div class="center">ไม่พบ Base ที่ค้นหาค่ะ 🥺</div>';
+
 return;
 }
 
@@ -140,15 +161,20 @@ list.innerHTML=result.map(b=>`
 ${b.price}฿
 </div>
 
-${b.commercial_x2?'<div class="note">💼 เชิงพาณิชย์ x2</div>':''}
+${b.commercial_x2?
+'<div class="note">💼 เชิงพาณิชย์ x2</div>':''}
 
 <div>
-${(b.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}
+${Array.isArray(b.tags)?
+b.tags.map(t=>`<span class="tag">${t}</span>`).join("")
+:""}
 </div>
 
-${b.max_orders?`<div class="note">📌 สูงสุด ${b.max_orders} งาน</div>`:""}
+${b.max_orders?
+`<div class="note">📌 สูงสุด ${b.max_orders} งาน</div>`:""}
 
-${b.notes?`<div class="note">${b.notes}</div>`:""}
+${b.notes?
+`<div class="note">${b.notes}</div>`:""}
 
 </div>
 
@@ -156,9 +182,9 @@ ${b.notes?`<div class="note">${b.notes}</div>`:""}
 
 }
 
-search.oninput=render;
-type.onchange=render;
-price.onchange=render;
+search.addEventListener("input",render);
+type.addEventListener("change",render);
+price.addEventListener("change",render);
 
 load();
 
