@@ -4,1038 +4,318 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>NIMURI — Bases ♡</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{box-sizing:border-box}
-
-:root{
-  --bg:#fff7fb;
-  --white:#fff;
-  --pink:#ef9fbe;
-  --pink-strong:#df729f;
-  --line:#efd8e2;
-  --text:#40343a;
-  --muted:#9b858e;
-  --soft:#f8edf2;
-  --dark:#44373e;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  font-size:14px;
-}
-
-button{
-  font:inherit;
-}
-
-.page{
-  width:min(100%,1120px);
-  margin:0 auto;
-  padding:0 16px 55px;
-}
-
-header{
-  text-align:center;
-  padding:38px 18px 34px;
-}
-
-header h1{
-  margin:0;
-  font-size:29px;
-  line-height:1.2;
-  font-weight:800;
-  letter-spacing:-.6px;
-}
-
-header p{
-  margin:8px 0 0;
-  color:#a18491;
-  font-size:17px;
-}
-
-.section-title{
-  font-size:13px;
-  font-weight:700;
-  color:#8e737f;
-  margin:0 0 9px;
-}
-
-.filter-section{
-  margin:0 0 22px;
-}
-
-.pills{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.pill{
-  border:1px solid #eccbd9;
-  background:#fff;
-  color:#806773;
-  padding:9px 14px;
-  border-radius:999px;
-  cursor:pointer;
-  white-space:nowrap;
-  transition:.16s ease;
-}
-
-.pill:hover{
-  transform:translateY(-1px);
-}
-
-.pill.active{
-  background:#ef9fbe;
-  color:#fff;
-  border-color:#ef9fbe;
-}
-
-.management{
-  background:#fff;
-  border:1px solid #efd8e2;
-  border-radius:18px;
-  padding:15px 17px;
-  margin:0 0 22px;
-}
-
-.management h2{
-  margin:0 0 5px;
-  font-size:17px;
-  line-height:1.3;
-  font-weight:800;
-}
-
-.management p{
-  margin:0;
-  color:#9b858e;
-  font-size:13px;
-  line-height:1.55;
-}
-
-.manage-btn{
-  margin-top:10px;
-  border:0;
-  border-radius:10px;
-  background:#44373e;
-  color:#fff;
-  padding:9px 14px;
-  cursor:pointer;
-}
-
-.management.on{
-  border-color:#ef9fbe;
-}
-
-.status-hint{
-  display:none;
-  margin-top:10px;
-  color:#b35f84;
-  font-size:12px;
-  line-height:1.5;
-}
-
-.management.on .status-hint{
-  display:block;
-}
-
-.count{
-  display:none;
-}
-
-.list{
-  display:grid;
-  gap:20px;
-}
-
-.card{
-  background:#fff;
-  border:1px solid #efd8e2;
-  border-radius:21px;
-  overflow:hidden;
-  box-shadow:0 7px 24px rgba(150,100,125,.08);
-}
-
-.cover{
-  position:relative;
-  min-height:180px;
-  background:#f8edf2;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.cover img{
-  width:100%;
-  height:auto;
-  max-height:560px;
-  object-fit:contain;
-  display:block;
-}
-
-.placeholder{
-  padding:45px 15px;
-  text-align:center;
-  color:#b39da6;
-  font-size:13px;
-  line-height:1.5;
-}
-
-.status{
-  position:absolute;
-  right:10px;
-  top:10px;
-  border-radius:999px;
-  padding:6px 9px;
-  background:#fff;
-  font-size:11px;
-  font-weight:800;
-  box-shadow:0 2px 8px #0001;
-  color:#d76d99;
-}
-
-.status.closed{
-  color:#777;
-}
-
-.card-body{
-  padding:17px;
-}
-
-.card h2{
-  margin:0 0 4px;
-  font-size:19px;
-  line-height:1.25;
-  font-weight:800;
-  letter-spacing:0;
-}
-
-.type-label{
-  font-size:12px;
-  color:#d47f9f;
-  margin-bottom:8px;
-}
-
-.owner{
-  margin:0 0 0;
-  color:#9a858e;
-  font-size:13px;
-}
-
-.price{
-  margin:9px 0;
-  color:#df729f;
-  font-size:18px;
-  font-weight:800;
-  line-height:1.3;
-}
-
-.details{
-  margin:8px 0 0;
-  padding-left:18px;
-  color:#65555d;
-  font-size:14px;
-  line-height:1.75;
-}
-
-.tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:8px;
-}
-
-.tag{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  border-radius:999px;
-  padding:5px 9px;
-  background:#fff0f6;
-  color:#bd6289;
-  font-size:12px;
-}
-
-.empty{
-  text-align:center;
-  color:#9b858e;
-  padding:45px 10px;
-}
-
-.error{
-  padding:20px;
-  border-radius:18px;
-  background:#fff0f0;
-  color:#b34e4e;
-  line-height:1.5;
-}
-
-.loading{
-  text-align:center;
-  color:#9b858e;
-  padding:45px 10px;
-}
-
+:root{--bg:#fff7fb;--white:#fff;--pink:#ef9fbe;--line:#efd8e2;--text:#40343a;--muted:#9b858e;--soft:#f8edf2}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:14px}
+button{font:inherit}
+.page{width:min(100%,1120px);margin:0 auto;padding:0 16px 55px}
+header{text-align:center;padding:38px 18px 28px}
+header h1{margin:0;font-size:29px;line-height:1.2;font-weight:800;letter-spacing:-.6px}
+header p{margin:8px 0 0;color:#a18491;font-size:17px}
+.summary{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px 17px;margin:0 0 22px;box-shadow:0 5px 18px rgba(150,100,125,.05)}
+.summary-total{font-size:17px;font-weight:800;line-height:1.4}
+.summary-status{margin-top:5px;color:var(--muted);font-size:13px;line-height:1.5}
+.open-count{color:#55a76b;font-weight:700}
+.closed-count{color:#c96b6b;font-weight:700}
+.section-title{font-size:13px;font-weight:700;color:#8e737f;margin:0 0 9px}
+.filter-section{margin:0 0 22px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1px solid #eccbd9;background:#fff;color:#806773;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:.16s ease}
+.pill:hover{transform:translateY(-1px)}
+.pill.active{background:#ef9fbe;color:#fff;border-color:#ef9fbe}
+.count{color:#9b858e;font-size:12px;margin:0 0 12px}
+.list{display:grid;gap:20px}
+.card{background:#fff;border:1px solid #efd8e2;border-radius:21px;overflow:hidden;box-shadow:0 7px 24px rgba(150,100,125,.08)}
+.cover{position:relative;min-height:180px;background:#f8edf2;display:flex;align-items:center;justify-content:center}
+.cover img{width:100%;height:auto;max-height:560px;object-fit:contain;display:block}
+.placeholder{padding:45px 15px;text-align:center;color:#b39da6;font-size:13px;line-height:1.5}
+.status{position:absolute;right:10px;top:10px;border-radius:999px;padding:6px 9px;background:#fff;font-size:11px;font-weight:800;box-shadow:0 2px 8px #0001;color:#d76d99}
+.status.closed{color:#777}
+.card-body{padding:17px}
+.card h2{margin:0 0 4px;font-size:19px;line-height:1.25;font-weight:800}
+.type-label{font-size:12px;color:#d47f9f;margin-bottom:8px}
+.owner{margin:0;color:#9a858e;font-size:13px}
+.price{margin:9px 0;color:#df729f;font-size:18px;font-weight:800;line-height:1.3}
+.details{margin:8px 0 0;padding-left:18px;color:#65555d;font-size:14px;line-height:1.75}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;background:#fff0f6;color:#bd6289;font-size:12px}
+.empty{text-align:center;color:#9b858e;padding:45px 10px}
+.error{padding:20px;border-radius:18px;background:#fff0f0;color:#b34e4e;line-height:1.5}
+.loading{text-align:center;color:#9b858e;padding:45px 10px}
 @media(max-width:600px){
-
-  .page{
-    padding:0 16px 55px;
-  }
-
-  header{
-    padding:38px 18px 34px;
-  }
-
-  header h1{
-    font-size:24px;
-    letter-spacing:-.3px;
-  }
-
-  header p{
-    font-size:17px;
-  }
-
-  .filter-section{
-    margin-bottom:22px;
-  }
-
-  .management{
-    padding:15px 17px;
-    border-radius:18px;
-    margin-bottom:22px;
-  }
-
-  .management h2{
-    font-size:17px;
-  }
-
-  .management p{
-    font-size:13px;
-  }
-
-  .card{
-    border-radius:21px;
-  }
-
-  .cover{
-    min-height:180px;
-  }
-
-  .card-body{
-    padding:17px;
-  }
-
-  .card h2{
-    font-size:19px;
-  }
-
-  .price{
-    font-size:18px;
-  }
-
-  .details{
-    font-size:14px;
-  }
+.page{padding:0 16px 55px}
+header{padding:38px 18px 28px}
+header h1{font-size:24px;letter-spacing:-.3px}
+header p{font-size:17px}
+.card{border-radius:21px}
+.cover{min-height:180px}
+.card-body{padding:17px}
 }
 </style>
 </head>
-
 <body>
-
 <div class="page">
-
 <header>
-  <h1>NIMURI — Bases ♡</h1>
-  <p>Bases I draw ♡</p>
+<h1>NIMURI — Bases ♡</h1>
+<p>Bases I draw ♡</p>
 </header>
-
-<section class="filter-section">
-
-  <h3 class="section-title">ประเภท</h3>
-
-  <div class="pills" id="typeFilters">
-
-    <button class="pill active" data-type="">
-      ทั้งหมด
-    </button>
-
-    <button class="pill" data-type="จิบิเดี่ยว">
-      จิบิเดี่ยว
-    </button>
-
-    <button class="pill" data-type="จิบิคู่">
-      จิบิคู่
-    </button>
-
-    <button class="pill" data-type="สเกลปกติ เดี่ยว">
-      สเกลปกติ เดี่ยว
-    </button>
-
-    <button class="pill" data-type="สเกลปกติ คู่">
-      สเกลปกติ คู่
-    </button>
-
-  </div>
-
-</section>
-
-<section class="filter-section">
-
-  <h3 class="section-title">สถานะรับงาน</h3>
-
-  <div class="pills" id="statusFilters">
-
-    <button class="pill active" data-status="">
-      ทั้งหมด
-    </button>
-
-    <button class="pill" data-status="open">
-      ♡ เปิดรับ
-    </button>
-
-    <button class="pill" data-status="closed">
-      ปิดรับ
-    </button>
-
-  </div>
-
-</section>
-
-<section class="management" id="management">
-
-  <h2>⚙️ โหมดจัดการเว็บ</h2>
-
-  <p>
-    เปิดโหมดนี้เพื่อให้ปุ่มเปิด/ปิดรับแสดงใต้แต่ละเบส<br>
-    ข้อมูลสถานะจะถูกจำไว้ในอุปกรณ์นี้
-  </p>
-
-  <button class="manage-btn" id="manageBtn">
-    เปิดโหมดจัดการ
-  </button>
-
-  <div class="status-hint">
-    โหมดจัดการเปิดอยู่ — แตะสถานะ OPEN / ปิดรับของแต่ละเบสเพื่อเปลี่ยนสถานะ
-  </div>
-
-</section>
-
-<div id="count" class="count">
-  กำลังโหลด...
+<section class="summary" aria-live="polite">
+<div class="summary-total" id="summaryTotal">♡ Base ทั้งหมด 0 เบส</div>
+<div class="summary-status" id="summaryStatus">
+<span class="open-count">🟢 เปิดรับ 0 เบส</span>
+·
+<span class="closed-count">🔴 ปิดรับ 0 เบส</span>
 </div>
-
+</section>
+<section class="filter-section">
+<h3 class="section-title">ประเภท</h3>
+<div class="pills" id="typeFilters">
+<button class="pill active" data-type="">ทั้งหมด</button>
+<button class="pill" data-type="จิบิเดี่ยว">จิบิเดี่ยว</button>
+<button class="pill" data-type="จิบิคู่">จิบิคู่</button>
+<button class="pill" data-type="สเกลปกติ เดี่ยว">สเกลปกติ เดี่ยว</button>
+<button class="pill" data-type="สเกลปกติ คู่">สเกลปกติ คู่</button>
+</div>
+</section>
+<section class="filter-section">
+<h3 class="section-title">สถานะรับงาน</h3>
+<div class="pills" id="statusFilters">
+<button class="pill active" data-status="">ทั้งหมด</button>
+<button class="pill" data-status="open">♡ เปิดรับ</button>
+<button class="pill" data-status="closed">🔴 ปิดรับ</button>
+</div>
+</section>
+<div id="count" class="count">กำลังโหลด...</div>
 <div id="list" class="list">
-
-  <div class="loading">
-    กำลังโหลด Base ♡
-  </div>
-
+<div class="loading">กำลังโหลด Base ♡</div>
 </div>
-
 </div>
-
 <script>
-
 const db=supabase.createClient(
-  "https://ncczyxjtcnchnzvrbtvy.supabase.co",
-  "sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm"
+"https://ncczyxjtcnchnzvrbtvy.supabase.co",
+"sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm"
 );
-
 let bases=[];
-
 let selectedType="";
-
 let selectedStatus="";
-
-let manageMode=false;
-
-const localStatusKey="nimuri-base-status";
-
 const list=document.getElementById("list");
-
 const count=document.getElementById("count");
-
-const management=document.getElementById("management");
-
-const manageBtn=document.getElementById("manageBtn");
-
-
+const summaryTotal=document.getElementById("summaryTotal");
+const summaryStatus=document.getElementById("summaryStatus");
 function escapeHTML(value){
-
-  return String(value??"").replace(
-    /[&<>"']/g,
-    m=>({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#039;"
-    }[m])
-  );
-
+return String(value??"").replace(/[&<>"']/g,m=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+}[m]));
 }
-
-
-function statusStore(){
-
-  try{
-
-    return JSON.parse(
-      localStorage.getItem(localStatusKey)||"{}"
-    );
-
-  }catch{
-
-    return {};
-
-  }
-
-}
-
-
 function getStatus(b){
-
-  const stored=statusStore();
-
-  if(
-    stored[String(b.id)]!==undefined
-  ){
-
-    return stored[String(b.id)]
-      ? "open"
-      : "closed";
-
-  }
-
-  const raw=String(
-    b.status ??
-    b.state ??
-    b.availability ??
-    ""
-  ).toLowerCase();
-
-  if(
-    [
-      "closed",
-      "close",
-      "ปิดรับ",
-      "ไม่รับ",
-      "unavailable"
-    ].some(x=>raw.includes(x))
-  ){
-
-    return "closed";
-
-  }
-
-  if(
-    [
-      "open",
-      "opened",
-      "เปิดรับ",
-      "รับงาน",
-      "available"
-    ].some(x=>raw.includes(x))
-  ){
-
-    return "open";
-
-  }
-
-  if(
-    b.is_open===false ||
-    b.open===false
-  ){
-
-    return "closed";
-
-  }
-
-  return "open";
-
+const raw=String(
+b.status??b.state??b.availability??""
+).trim().toLowerCase();
+if(["closed","close","ปิดรับ","ไม่รับ","unavailable"].some(x=>raw.includes(x))){
+return "closed";
 }
-
-
+if(["open","opened","เปิดรับ","รับงาน","available"].some(x=>raw.includes(x))){
+return "open";
+}
+if(b.is_open===false||b.open===false){
+return "closed";
+}
+return "open";
+}
 function imageFor(b){
-
-  return (
-    b.image_url ||
-    b.image ||
-    b.image_path ||
-    b.cover_url ||
-    "images/base-01.png"
-  );
-
+return b.image_url||b.image||b.image_path||b.cover_url||"images/base-01.png";
 }
-
-
 function typeFor(b){
-
-  return String(
-    b.type ||
-    b.category ||
-    ""
-  ).trim();
-
+return String(b.type||b.category||"").trim();
 }
-
-
 function priceText(b){
-
-  const price=
-    b.price==null
-      ? ""
-      : b.price;
-
-  const commercial=
-    b.commercial_x2===true ||
-    String(b.commercial_x2)
-      .toLowerCase()==="true";
-
-  return `
-    PRICE : ${escapeHTML(price)}B
-    · เชิงพาณิชย์ ${commercial?"×2":"×1"}
-  `;
-
+const price=b.price==null?"":b.price;
+const commercial=
+b.commercial_x2===true||
+String(b.commercial_x2).toLowerCase()==="true";
+return `PRICE : ${escapeHTML(price)}B · เชิงพาณิชย์ ${commercial?"×2":"×1"}`;
 }
-
-
 function detailsFor(b){
-
-  if(Array.isArray(b.details)){
-
-    return b.details.filter(Boolean);
-
-  }
-
-  if(Array.isArray(b.notes)){
-
-    return b.notes.filter(Boolean);
-
-  }
-
-  const notes=
-    String(b.notes||"").trim();
-
-  if(notes){
-
-    return notes
-      .split(/\n|•/)
-      .map(x=>x.trim())
-      .filter(Boolean);
-
-  }
-
-  const result=[];
-
-  if(b.expressions){
-
-    result.push(
-      `มีสีหน้าให้เลือกถึง ${b.expressions} สีหน้า`
-    );
-
-  }
-
-  if(b.addons){
-
-    result.push(
-      `เพิ่มของถือ ${b.addons}`
-    );
-
-  }
-
-  if(b.max_orders){
-
-    result.push(
-      `1คนสั่งได้สูงสุด ${b.max_orders}งาน (ต่อรอบ)`
-    );
-
-  }
-
-  return result;
-
+if(Array.isArray(b.details))return b.details.filter(Boolean);
+if(Array.isArray(b.notes))return b.notes.filter(Boolean);
+const notes=String(b.notes||"").trim();
+if(notes){
+return notes.split(/\n|•/).map(x=>x.trim()).filter(Boolean);
 }
-
-
+const result=[];
+if(b.expressions){
+result.push(`มีสีหน้าให้เลือกถึง ${b.expressions} สีหน้า`);
+}
+if(b.addons){
+result.push(`เพิ่มของถือ ${b.addons}`);
+}
+if(b.max_orders){
+result.push(`1คนสั่งได้สูงสุด ${b.max_orders}งาน (ต่อรอบ)`);
+}
+return result;
+}
+function updateSummary(){
+const total=bases.length;
+const openCount=bases.filter(
+b=>getStatus(b)==="open"
+).length;
+const closedCount=bases.filter(
+b=>getStatus(b)==="closed"
+).length;
+summaryTotal.textContent=
+`♡ Base ทั้งหมด ${total} เบส`;
+summaryStatus.innerHTML=`
+<span class="open-count">🟢 เปิดรับ ${openCount} เบส</span>
+·
+<span class="closed-count">🔴 ปิดรับ ${closedCount} เบส</span>
+`;
+}
 function filterButtons(){
-
-  document
-    .querySelectorAll("#typeFilters .pill")
-    .forEach(btn=>{
-
-      btn.classList.toggle(
-        "active",
-        btn.dataset.type===selectedType
-      );
-
-    });
-
-  document
-    .querySelectorAll("#statusFilters .pill")
-    .forEach(btn=>{
-
-      btn.classList.toggle(
-        "active",
-        btn.dataset.status===selectedStatus
-      );
-
-    });
-
-}
-
-
-function render(){
-
-  filterButtons();
-
-  const result=
-    bases.filter(b=>{
-
-      const t=typeFor(b);
-
-      const s=getStatus(b);
-
-      const typeOK=
-        !selectedType ||
-        t.includes(selectedType);
-
-      const statusOK=
-        !selectedStatus ||
-        s===selectedStatus;
-
-      return typeOK && statusOK;
-
-    });
-
-
-  count.textContent=
-    `พบ ${result.length} จาก ${bases.length} Base`;
-
-
-  if(!result.length){
-
-    list.innerHTML=
-      '<div class="empty">ไม่พบ Base ตามตัวกรองนี้ ♡</div>';
-
-    return;
-
-  }
-
-
-  list.innerHTML=
-    result.map(b=>{
-
-      const s=getStatus(b);
-
-      const details=
-        detailsFor(b);
-
-      const tags=
-        Array.isArray(b.tags)
-          ? b.tags
-          : [];
-
-      const image=
-        imageFor(b);
-
-      const title=
-        escapeHTML(
-          b.name ||
-          "ไม่มีชื่อ"
-        );
-
-      const type=
-        escapeHTML(
-          typeFor(b) ||
-          "ไม่ระบุประเภท"
-        );
-
-      const owner=
-        escapeHTML(
-          b.owner_name ||
-          b.owner ||
-          "ไม่ระบุ"
-        );
-
-      const alt=
-        escapeHTML(
-          b.name ||
-          "Nimuri Base"
-        );
-
-
-      return `
-
-        <article class="card">
-
-          <div class="cover">
-
-            <img
-              src="${escapeHTML(image)}"
-              alt="${alt}"
-              onerror="
-                this.style.display='none';
-                this.nextElementSibling.style.display='block'
-              "
-            >
-
-            <div
-              class="placeholder"
-              style="display:none"
-            >
-              ใส่รูปที่<br>
-              ${escapeHTML(image)}
-            </div>
-
-            <div
-              class="status ${s==="closed"?"closed":""}"
-            >
-              ${s==="open"?"OPEN":"CLOSED"}
-            </div>
-
-          </div>
-
-
-          <div class="card-body">
-
-            <h2>
-              ${title}
-            </h2>
-
-            <div class="type-label">
-              ${type}
-            </div>
-
-            <div class="owner">
-              baes: ${owner}
-            </div>
-
-            <div class="price">
-              ${priceText(b)}
-            </div>
-
-
-            ${
-              details.length
-              ?`
-
-                <ul class="details">
-
-                  ${details
-                    .map(
-                      x=>`
-                        <li>
-                          ${escapeHTML(x)}
-                        </li>
-                      `
-                    )
-                    .join("")
-                  }
-
-                </ul>
-
-              `
-              :""
-            }
-
-
-            ${
-              tags.length
-              ?`
-
-                <div class="tags">
-
-                  ${tags
-                    .map(
-                      x=>`
-                        <span class="tag">
-                          ${escapeHTML(x)}
-                        </span>
-                      `
-                    )
-                    .join("")
-                  }
-
-                </div>
-
-              `
-              :""
-            }
-
-
-            ${
-              manageMode
-              ?`
-
-                <button
-                  class="manage-btn"
-                  style="margin-top:22px"
-                  onclick="
-                    toggleLocalStatus(
-                      '${escapeHTML(String(b.id))}'
-                    )
-                  "
-                >
-
-                  ${
-                    s==="open"
-                    ? "ปิดรับงาน"
-                    : "เปิดรับงาน"
-                  }
-
-                </button>
-
-              `
-              :""
-            }
-
-          </div>
-
-        </article>
-
-      `;
-
-    }).join("");
-
-}
-
-
-window.toggleLocalStatus=function(id){
-
-  const stored=
-    statusStore();
-
-  const base=
-    bases.find(
-      b=>String(b.id)===id
-    );
-
-  stored[id]=
-    getStatus(base)!=="open";
-
-  localStorage.setItem(
-    localStatusKey,
-    JSON.stringify(stored)
-  );
-
-  render();
-
-};
-
-
-manageBtn.addEventListener(
-  "click",
-  ()=>{
-
-    manageMode=!manageMode;
-
-    management.classList.toggle(
-      "on",
-      manageMode
-    );
-
-    manageBtn.textContent=
-      manageMode
-      ? "ปิดโหมดจัดการ"
-      : "เปิดโหมดจัดการ";
-
-    render();
-
-  }
+document.querySelectorAll("#typeFilters .pill").forEach(btn=>{
+btn.classList.toggle(
+"active",
+btn.dataset.type===selectedType
 );
-
-
-document
-  .querySelectorAll("#typeFilters .pill")
-  .forEach(btn=>{
-
-    btn.addEventListener(
-      "click",
-      ()=>{
-        selectedType=
-          btn.dataset.type;
-
-        render();
-      }
-    );
-
-  });
-
-
-document
-  .querySelectorAll("#statusFilters .pill")
-  .forEach(btn=>{
-
-    btn.addEventListener(
-      "click",
-      ()=>{
-        selectedStatus=
-          btn.dataset.status;
-
-        render();
-      }
-    );
-
-  });
-
-
-async function load(){
-
-  const result=
-    await db
-      .from("bases_with_tags")
-      .select("*")
-      .order(
-        "id",
-        {ascending:true}
-      );
-
-
-  if(result.error){
-
-    console.log(
-      result.error
-    );
-
-    list.innerHTML=
-      `
-        <div class="error">
-          โหลดข้อมูลไม่สำเร็จค่ะ 🥺
-          <br>
-          ${escapeHTML(
-            result.error.message
-          )}
-        </div>
-      `;
-
-    count.textContent="";
-
-    return;
-
-  }
-
-
-  bases=
-    result.data || [];
-
-  render();
-
+});
+document.querySelectorAll("#statusFilters .pill").forEach(btn=>{
+btn.classList.toggle(
+"active",
+btn.dataset.status===selectedStatus
+);
+});
 }
-
-
+function render(){
+filterButtons();
+updateSummary();
+const result=bases.filter(b=>{
+const t=typeFor(b);
+const s=getStatus(b);
+const typeOK=
+!selectedType||
+t.includes(selectedType);
+const statusOK=
+!selectedStatus||
+s===selectedStatus;
+return typeOK&&statusOK;
+});
+count.textContent=
+`พบ ${result.length} จาก ${bases.length} Base`;
+if(!result.length){
+list.innerHTML=
+'<div class="empty">ไม่พบ Base ตามตัวกรองนี้ ♡</div>';
+return;
+}
+list.innerHTML=result.map(b=>{
+const s=getStatus(b);
+const details=detailsFor(b);
+const tags=
+Array.isArray(b.tags)?b.tags:[];
+const image=imageFor(b);
+const title=
+escapeHTML(b.name||"ไม่มีชื่อ");
+const type=
+escapeHTML(typeFor(b)||"ไม่ระบุประเภท");
+const owner=
+escapeHTML(b.owner_name||b.owner||"ไม่ระบุ");
+const alt=
+escapeHTML(b.name||"Nimuri Base");
+return `
+<article class="card">
+<div class="cover">
+<img
+src="${escapeHTML(image)}"
+alt="${alt}"
+onerror="
+this.style.display='none';
+this.nextElementSibling.style.display='block'
+">
+<div class="placeholder" style="display:none">
+ใส่รูปที่<br>
+${escapeHTML(image)}
+</div>
+<div class="status ${s==="closed"?"closed":""}">
+${s==="open"?"OPEN":"CLOSED"}
+</div>
+</div>
+<div class="card-body">
+<h2>${title}</h2>
+<div class="type-label">${type}</div>
+<div class="owner">
+baes: ${owner}
+</div>
+<div class="price">
+${priceText(b)}
+</div>
+${
+details.length
+?`
+<ul class="details">
+${details.map(x=>`
+<li>${escapeHTML(x)}</li>
+`).join("")}
+</ul>
+`
+:""
+}
+${
+tags.length
+?`
+<div class="tags">
+${tags.map(x=>`
+<span class="tag">${escapeHTML(x)}</span>
+`).join("")}
+</div>
+`
+:""
+}
+</div>
+</article>
+`;
+}).join("");
+}
+document.querySelectorAll("#typeFilters .pill").forEach(btn=>{
+btn.addEventListener("click",()=>{
+selectedType=btn.dataset.type;
+render();
+});
+});
+document.querySelectorAll("#statusFilters .pill").forEach(btn=>{
+btn.addEventListener("click",()=>{
+selectedStatus=btn.dataset.status;
+render();
+});
+});
+async function load(){
+list.innerHTML=`
+<div class="loading">
+กำลังโหลด Base ♡
+</div>
+`;
+const result=await db
+.from("bases_with_tags")
+.select("*")
+.order("id",{ascending:true});
+if(result.error){
+console.log(result.error);
+list.innerHTML=`
+<div class="error">
+โหลดข้อมูลไม่สำเร็จค่ะ 🥺
+<br>
+${escapeHTML(result.error.message)}
+</div>
+`;
+count.textContent="";
+summaryTotal.textContent="♡ Base ทั้งหมด —";
+summaryStatus.textContent="ไม่สามารถโหลดสถานะได้";
+return;
+}
+bases=result.data||[];
+render();
+}
 load();
-
 </script>
-
 </body>
 </html>
