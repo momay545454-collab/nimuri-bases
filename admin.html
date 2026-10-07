@@ -1,130 +1,1989 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NIMURI — Admin</title>
+<!doctype html>
+<html lang="th">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<title>NIMURI — Admin</title>
+
+
 <style>
-*{box-sizing:border-box}
-:root{--bg:#fff7fb;--white:#fff;--pink:#ef9fbe;--pink2:#df729f;--line:#efd8e2;--text:#40343a;--muted:#9b858e;--dark:#44373e}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:14px}
-button,input,select,textarea{font:inherit}button{cursor:pointer}
-header{text-align:center;padding:30px 16px 22px}header h1{margin:0;font-size:27px}header p{margin:7px 0 0;color:var(--muted)}
-.admin-wrap{width:min(100%,980px);margin:auto;padding:0 14px 50px}
-.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:16px;box-shadow:0 6px 22px rgba(150,100,125,.06)}
-.row{display:flex;gap:10px;align-items:center}.between{justify-content:space-between}
-h2{margin:0 0 8px;font-size:18px}.muted{color:var(--muted);font-size:13px;line-height:1.5}
-label{display:block;font-weight:700;font-size:13px;margin:12px 0 0}
-input,select,textarea{width:100%;margin-top:6px;border:1px solid #ead1dc;border-radius:12px;background:#fff;padding:11px 12px;color:var(--text);outline:none}
-textarea{resize:vertical}.primary,.secondary,.danger{border-radius:11px;padding:10px 14px}.primary{background:var(--dark);color:#fff;border:0}.secondary{background:#fff;border:1px solid #e6ccd8;color:#725d67}.danger{background:#fff0f2;color:#c65d70;border:1px solid #f0cbd2}.small{padding:8px 11px;font-size:12px}
-.msg{color:#b35f84;min-height:18px}.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center}
-.admin-list,.tag-admin{display:grid;gap:10px}.base-row,.tag-row{border:1px solid #f0dfe6;border-radius:15px;padding:13px;display:flex;justify-content:space-between;gap:12px;align-items:center}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.chips span,.tag{background:#fff0f6;color:#bd6289;border-radius:999px;padding:4px 8px;font-size:11px}
-.modal{position:fixed;inset:0;background:rgba(60,40,50,.28);display:none;align-items:flex-end;justify-content:center;padding:10px;z-index:20}.modal.show{display:flex}.modal-card{width:min(100%,650px);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:18px;position:relative}.modal-x{position:absolute;right:12px;top:10px;border:0;background:#f8edf2;border-radius:50%;width:34px;height:34px;font-size:22px;color:#7d6570}
-.check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.check{font-weight:500;background:#fff8fb;border:1px solid #efdde5;border-radius:10px;padding:9px}.check input{width:auto;margin:0 6px 0 0}
-.image-box{border:1px dashed #e6bfd0;border-radius:15px;padding:12px;margin-top:7px;background:#fffafd}.preview{width:100%;max-height:260px;object-fit:contain;border-radius:12px;background:#f8edf2;margin-top:9px;display:none}.file-name{color:var(--muted);font-size:12px;word-break:break-all}.progress{height:7px;background:#f3e4ea;border-radius:99px;overflow:hidden;margin-top:10px;display:none}.progress i{display:block;width:35%;height:100%;background:var(--pink);animation:move 1s infinite alternate}@keyframes move{from{transform:translateX(0)}to{transform:translateX(180%)}}
-@media(max-width:600px){header h1{font-size:24px}.topbar,.base-row,.tag-row{align-items:flex-start;flex-direction:column}.actions{width:100%;justify-content:flex-start}.actions button{flex:1}.check-grid{grid-template-columns:1fr}}
-</style></head><body>
-<header><h1>NIMURI — Owner ♡</h1><p>จัดการ Bases</p></header>
-<div class="admin-wrap"><div id="loginBox" class="panel"><h2>🔐 เข้าสู่หน้าของเจ้าของ</h2><label>อีเมล<input id="email" type="email" autocomplete="email"></label><label>รหัสผ่าน<input id="password" type="password" autocomplete="current-password"></label><button class="primary" id="loginBtn">เข้าสู่ระบบ</button><p id="loginMsg" class="msg"></p></div>
-<div id="app" style="display:none"><div class="panel topbar"><div><b id="who"></b><div class="muted">เฉพาะบัญชีเจ้าของที่ได้รับสิทธิ์เท่านั้น</div></div><button id="logoutBtn" class="secondary">ออกจากระบบ</button></div>
-<div class="panel"><div class="row between"><h2>🏷️ แท็ก</h2><button class="primary small" id="newTagBtn">+ เพิ่มแท็ก</button></div><div id="tagList" class="tag-admin"></div></div>
-<div class="panel"><div class="row between"><h2>🎨 Bases</h2><button class="primary small" id="newBaseBtn">+ เพิ่ม Base</button></div><div id="baseList" class="admin-list"></div></div></div></div>
-<div id="modal" class="modal"><div class="modal-card"><button class="modal-x" id="closeModal">×</button><h2 id="modalTitle"></h2><div id="modalBody"></div></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
-const SUPABASE_URL="https://ncczyxjtcnchnzvrbtvy.supabase.co",SUPABASE_KEY="sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm";
-const IMAGE_BUCKET="base-images";let sb=null,bases=[],tags=[];const labels={"chibi-single":"จิบิเดี่ยว","chibi-pair":"จิบิคู่","normal-single":"สเกลปกติ เดี่ยว","normal-pair":"สเกลปกติ คู่"};
-const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-async function start(){sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const {data:{session}}=await sb.auth.getSession();if(session) await showApp(session);sb.auth.onAuthStateChange((_e,s)=>s?showApp(s):showLogin())}
-async function showApp(s){$('loginBox').style.display='none';$('app').style.display='block';$('who').textContent=s.user.email||'เจ้าของ';await load()}
-function showLogin(){$('loginBox').style.display='block';$('app').style.display='none'}
-$('loginBtn').onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$('email').value,password:$('password').value});$('loginMsg').textContent=error?error.message:''}
-$('logoutBtn').onclick=()=>sb.auth.signOut();
-async function load(){const b=await sb.from('bases').select('*').order('sort_order').order('created_at');const t=await sb.from('tags').select('*').order('name');const bt=await sb.from('base_tags').select('base_id,tag_id');if(b.error||t.error||bt.error){alert('โหลดข้อมูลไม่สำเร็จ: '+(b.error?.message||t.error?.message||bt.error?.message));return}const map={};(bt.data||[]).forEach(x=>(map[x.base_id]??=[]).push(x.tag_id));bases=(b.data||[]).map(x=>({...x,tag_ids:map[x.id]||[]}));tags=t.data||[];renderTags();renderBases()}
-function renderTags(){$('tagList').innerHTML=tags.map(t=>`<div class="tag-row"><span>${esc(t.name)}</span><div><button class="secondary small" onclick="renameTag('${t.id}')">แก้ชื่อ</button><button class="danger small" onclick="deleteTag('${t.id}')">ลบ</button></div></div>`).join('')||'<div class="muted">ยังไม่มีแท็ก</div>'}
-function renderBases(){$('baseList').innerHTML=bases.map(b=>`<div class="base-row"><div><b>${esc(b.name)}</b><div class="muted">${esc(labels[b.category]||b.category)} · ${Number(b.price)||0}B · ${b.status==='open'?'🟢 เปิดรับ':'🔴 ปิดรับ'}</div><div class="chips">${b.tag_ids.map(id=>{const t=tags.find(x=>x.id===id);return t?`<span>${esc(t.name)}</span>`:''}).join('')}</div></div><div class="actions"><button class="secondary small" onclick="editBase('${b.id}')">✏️ แก้ไข</button><button class="secondary small" onclick="toggleStatus('${b.id}')">${b.status==='open'?'🔴 ปิดรับ':'🟢 เปิดรับ'}</button><button class="danger small" onclick="deleteBase('${b.id}')">ลบ</button></div></div>`).join('')||'<div class="muted">ยังไม่มี Base</div>'}
-function openModal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modal').classList.add('show')}function closeModal(){$('modal').classList.remove('show')}$('closeModal').onclick=closeModal;$('modal').onclick=e=>{if(e.target===$('modal'))closeModal()};
-$('newTagBtn').onclick=()=>openModal('เพิ่มแท็ก',`<label>ชื่อแท็ก<input id="tagName"></label><button class="primary" onclick="createTag()">เพิ่มแท็ก</button>`);
-async function createTag(){const name=$('tagName').value.trim();if(!name)return;if((await sb.from('tags').insert({name})).error)return alert('สร้างแท็กไม่สำเร็จ');closeModal();load()}
-async function renameTag(id){const t=tags.find(x=>x.id===id);const name=prompt('ชื่อแท็กใหม่',t.name);if(!name||name.trim()===t.name)return;const {error}=await sb.from('tags').update({name:name.trim()}).eq('id',id);if(error)alert(error.message);else load()}
-async function deleteTag(id){if(!confirm('ลบแท็กนี้? การติดแท็กของ Base จะถูกถอดออก'))return;const {error}=await sb.from('tags').delete().eq('id',id);if(error)alert(error.message);else load()}
-$('newBaseBtn').onclick=()=>showBaseForm();
-function showBaseForm(b=null){
-  const d=(b?.details||[]).join('\n');
-  const currentStatus=b?.status||'open';
-  openModal(b?'แก้ไข Base':'เพิ่ม Base',`
-    <label>ชื่อ Base<input id="fName" value="${esc(b?.name||'')}" placeholder="เช่น Full body"></label>
-    <label>เครดิต / เจ้าของ<input id="fCredit" value="${esc(b?.credit||'')}" placeholder="เช่น คุณ mew kotchakorn"></label>
-    <label>ราคา (บาท)<input id="fPrice" type="number" min="0" value="${Number(b?.price)||0}"></label>
-    <label>ประเภท<select id="fCat">${Object.entries(labels).map(([k,v])=>`<option value="${k}" ${b?.category===k?'selected':''}>${v}</option>`).join('')}</select></label>
-    <label>สถานะ<select id="fStatus"><option value="open" ${currentStatus==='open'?'selected':''}>🟢 เปิดรับ</option><option value="closed" ${currentStatus==='closed'?'selected':''}>🔴 ปิดรับ</option></select></label>
-    <label>รายละเอียด (1 บรรทัดต่อ 1 ข้อ)<textarea id="fDetails" rows="6" placeholder="เช่น มีสีหน้าให้เลือกถึง 4 สีหน้า">${esc(d)}</textarea></label>
-    <label>รูปภาพ Base</label>
-    <div class="image-box">
-      <div class="muted">กดเลือกภาพจากมือถือ/คอมได้เลย ไม่ต้องใส่ URL เอง</div>
-      <input id="fImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-      <div id="fileName" class="file-name"></div>
-      <img id="imagePreview" class="preview" alt="ตัวอย่างรูป">
-      ${b?.image_url?`<div class="muted" style="margin-top:8px">มีรูปเดิมอยู่แล้ว — ถ้าไม่เลือกไฟล์ใหม่จะใช้รูปเดิม</div>`:''}
-      <div id="uploadProgress" class="progress"><i></i></div>
-    </div>
-    <div style="font-weight:700;margin-top:15px">🏷️ แท็ก</div>
-    <div class="check-grid">${tags.map(t=>`<label class="check"><input type="checkbox" value="${t.id}" ${b?.tag_ids?.includes(t.id)?'checked':''}> ${esc(t.name)}</label>`).join('')||'<div class="muted">ยังไม่มีแท็ก</div>'}</div>
-    <div style="display:flex;gap:8px;margin-top:16px"><button class="primary" onclick="saveBase('${b?.id||''}')">💾 บันทึก</button><button class="secondary" onclick="closeModal()">ยกเลิก</button></div>
-  `);
-  $('fImage').addEventListener('change',()=>{
-    const file=$('fImage').files[0];
-    $('fileName').textContent=file?`เลือกรูป: ${file.name}`:'';
-    if(!file){$('imagePreview').style.display='none';return}
-    $('imagePreview').src=URL.createObjectURL(file);
-    $('imagePreview').style.display='block';
-  });
+
+*{
+  box-sizing:border-box
 }
 
-async function uploadImage(file){
-  const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-  const path=`${crypto.randomUUID()}-${safe}`;
-  const {error}=await sb.storage.from(IMAGE_BUCKET).upload(path,file,{upsert:false});
-  if(error)throw error;
-  return sb.storage.from(IMAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+:root{
+  --bg:#fff7fb;
+  --white:#fff;
+  --pink:#ef9fbe;
+  --pink2:#df729f;
+  --line:#efd8e2;
+  --text:#40343a;
+  --muted:#9b858e;
+  --dark:#44373e
 }
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+  font-size:14px
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit
+}
+
+button{
+  cursor:pointer
+}
+
+header{
+  text-align:center;
+  padding:30px 16px 22px
+}
+
+header h1{
+  margin:0;
+  font-size:27px
+}
+
+header p{
+  margin:7px 0 0;
+  color:var(--muted)
+}
+
+.admin-wrap{
+  width:min(100%,980px);
+  margin:auto;
+  padding:0 14px 50px
+}
+
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:17px;
+  margin-bottom:16px;
+  box-shadow:0 6px 22px rgba(150,100,125,.06)
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center
+}
+
+.between{
+  justify-content:space-between
+}
+
+h2{
+  margin:0 0 8px;
+  font-size:18px
+}
+
+.muted{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5
+}
+
+label{
+  display:block;
+  font-weight:700;
+  font-size:13px;
+  margin:12px 0 0
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  margin-top:6px;
+  border:1px solid #ead1dc;
+  border-radius:12px;
+  background:#fff;
+  padding:11px 12px;
+  color:var(--text);
+  outline:none
+}
+
+textarea{
+  resize:vertical
+}
+
+.primary,
+.secondary,
+.danger{
+  border-radius:11px;
+  padding:10px 14px
+}
+
+.primary{
+  background:var(--dark);
+  color:#fff;
+  border:0
+}
+
+.secondary{
+  background:#fff;
+  border:1px solid #e6ccd8;
+  color:#725d67
+}
+
+.danger{
+  background:#fff0f2;
+  color:#c65d70;
+  border:1px solid #f0cbd2
+}
+
+.small{
+  padding:8px 11px;
+  font-size:12px
+}
+
+.msg{
+  color:#b35f84;
+  min-height:18px
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center
+}
+
+.admin-list,
+.tag-admin{
+  display:grid;
+  gap:10px
+}
+
+.base-row,
+.tag-row{
+  border:1px solid #f0dfe6;
+  border-radius:15px;
+  padding:13px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center
+}
+
+.actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  justify-content:flex-end
+}
+
+.chips{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:7px
+}
+
+.chips span,
+.tag{
+  background:#fff0f6;
+  color:#bd6289;
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:11px
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(60,40,50,.28);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:10px;
+  z-index:20
+}
+
+.modal.show{
+  display:flex
+}
+
+.modal-card{
+  width:min(100%,650px);
+  max-height:92vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:22px;
+  padding:18px;
+  position:relative
+}
+
+.modal-x{
+  position:absolute;
+  right:12px;
+  top:10px;
+  border:0;
+  background:#f8edf2;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  font-size:22px;
+  color:#7d6570
+}
+
+.check-grid{
+  display:grid;
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:8px
+}
+
+.check{
+  font-weight:500;
+  background:#fff8fb;
+  border:1px solid #efdde5;
+  border-radius:10px;
+  padding:9px
+}
+
+.check input{
+  width:auto;
+  margin:0 6px 0 0
+}
+
+.image-box{
+  border:1px dashed #e6bfd0;
+  border-radius:15px;
+  padding:12px;
+  margin-top:7px;
+  background:#fffafd
+}
+
+.preview{
+  width:100%;
+  max-height:260px;
+  object-fit:contain;
+  border-radius:12px;
+  background:#f8edf2;
+  margin-top:9px;
+  display:none
+}
+
+.file-name{
+  color:var(--muted);
+  font-size:12px;
+  word-break:break-all
+}
+
+.progress{
+  height:7px;
+  background:#f3e4ea;
+  border-radius:99px;
+  overflow:hidden;
+  margin-top:10px;
+  display:none
+}
+
+.progress i{
+  display:block;
+  width:35%;
+  height:100%;
+  background:var(--pink);
+  animation:move 1s infinite alternate
+}
+
+@keyframes move{
+  from{
+    transform:translateX(0)
+  }
+
+  to{
+    transform:translateX(180%)
+  }
+}
+
+@media(max-width:600px){
+
+  header h1{
+    font-size:24px
+  }
+
+  .topbar,
+  .base-row,
+  .tag-row{
+    align-items:flex-start;
+    flex-direction:column
+  }
+
+  .actions{
+    width:100%;
+    justify-content:flex-start
+  }
+
+  .actions button{
+    flex:1
+  }
+
+  .check-grid{
+    grid-template-columns:1fr
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+  <h1>NIMURI — Owner ♡</h1>
+
+  <p>จัดการ Bases</p>
+
+</header>
+
+
+<div class="admin-wrap">
+
+
+  <!-- LOGIN -->
+
+  <div
+    id="loginBox"
+    class="panel"
+  >
+
+    <h2>
+      🔐 เข้าสู่หน้าของเจ้าของ
+    </h2>
+
+
+    <label>
+
+      อีเมล
+
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+      >
+
+    </label>
+
+
+    <label>
+
+      รหัสผ่าน
+
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+      >
+
+    </label>
+
+
+    <button
+      class="primary"
+      id="loginBtn"
+    >
+      เข้าสู่ระบบ
+    </button>
+
+
+    <p
+      id="loginMsg"
+      class="msg"
+    ></p>
+
+  </div>
+
+
+  <!-- ADMIN APP -->
+
+  <div
+    id="app"
+    style="display:none"
+  >
+
+
+    <!-- TOP BAR -->
+
+    <div
+      class="panel topbar"
+    >
+
+      <div>
+
+        <b id="who"></b>
+
+        <div class="muted">
+          เฉพาะบัญชีเจ้าของที่ได้รับสิทธิ์เท่านั้น
+        </div>
+
+      </div>
+
+
+      <button
+        id="logoutBtn"
+        class="secondary"
+      >
+        ออกจากระบบ
+      </button>
+
+    </div>
+
+
+    <!-- TAGS -->
+
+    <div class="panel">
+
+      <div class="row between">
+
+        <h2>
+          🏷️ แท็ก
+        </h2>
+
+
+        <button
+          class="primary small"
+          id="newTagBtn"
+        >
+          + เพิ่มแท็ก
+        </button>
+
+      </div>
+
+
+      <div
+        id="tagList"
+        class="tag-admin"
+      ></div>
+
+    </div>
+
+
+    <!-- BASES -->
+
+    <div class="panel">
+
+      <div class="row between">
+
+        <h2>
+          🎨 Bases
+        </h2>
+
+
+        <button
+          class="primary small"
+          id="newBaseBtn"
+        >
+          + เพิ่ม Base
+        </button>
+
+      </div>
+
+
+      <div
+        id="baseList"
+        class="admin-list"
+      ></div>
+
+    </div>
+
+
+  </div>
+
+
+</div>
+
+
+<!-- MODAL -->
+
+<div
+  id="modal"
+  class="modal"
+>
+
+  <div class="modal-card">
+
+
+    <button
+      class="modal-x"
+      id="closeModal"
+    >
+      ×
+    </button>
+
+
+    <h2 id="modalTitle"></h2>
+
+
+    <div
+      id="modalBody"
+    ></div>
+
+
+  </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+  "https://ncczyxjtcnchnzvrbtvy.supabase.co";
+
+
+const SUPABASE_KEY =
+  "sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm";
+
+
+const IMAGE_BUCKET =
+  "base-images";
+
+
+let sb = null;
+
+let bases = [];
+
+let tags = [];
+
+
+const labels = {
+
+  "chibi-single":
+    "จิบิเดี่ยว",
+
+  "chibi-pair":
+    "จิบิคู่",
+
+  "normal-single":
+    "สเกลปกติ เดี่ยว",
+
+  "normal-pair":
+    "สเกลปกติ คู่"
+
+};
+
+
+const $ =
+  id => document.getElementById(id);
+
+
+const esc =
+  s =>
+    String(s ?? "")
+      .replace(
+        /[&<>"']/g,
+        m =>
+          ({
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#039;"
+          }[m])
+      );
+
+
+/* =========================
+   START
+========================= */
+
+async function start(){
+
+  sb =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+  const {
+    data:{
+      session
+    }
+  } =
+    await sb.auth.getSession();
+
+
+  if(session){
+
+    await showApp(session);
+
+  }
+
+
+  sb.auth.onAuthStateChange(
+    (_e,s) =>
+      s
+        ? showApp(s)
+        : showLogin()
+  );
+
+}
+
+
+/* =========================
+   SHOW APP
+========================= */
+
+async function showApp(s){
+
+  $("loginBox").style.display =
+    "none";
+
+  $("app").style.display =
+    "block";
+
+
+  $("who").textContent =
+    s.user.email ||
+    "เจ้าของ";
+
+
+  await load();
+
+}
+
+
+/* =========================
+   SHOW LOGIN
+========================= */
+
+function showLogin(){
+
+  $("loginBox").style.display =
+    "block";
+
+  $("app").style.display =
+    "none";
+
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+$("loginBtn").onclick =
+  async()=>{
+
+    const {
+      error
+    } =
+      await sb.auth.signInWithPassword({
+
+        email:
+          $("email").value,
+
+        password:
+          $("password").value
+
+      });
+
+
+    $("loginMsg").textContent =
+      error
+        ? error.message
+        : "";
+
+  };
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+$("logoutBtn").onclick =
+  () =>
+    sb.auth.signOut();
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+async function load(){
+
+  /*
+    สำคัญ:
+    ไม่มี sort_order แล้ว
+    เพราะตาราง bases จริง
+    ไม่มี column นี้
+  */
+
+  const b =
+    await sb
+      .from("bases")
+      .select("*")
+      .order(
+        "created_at"
+      );
+
+
+  const t =
+    await sb
+      .from("tags")
+      .select("*")
+      .order(
+        "name"
+      );
+
+
+  const bt =
+    await sb
+      .from("base_tags")
+      .select(
+        "base_id,tag_id"
+      );
+
+
+  if(
+    b.error ||
+    t.error ||
+    bt.error
+  ){
+
+    alert(
+      "โหลดข้อมูลไม่สำเร็จ: " +
+      (
+        b.error?.message ||
+        t.error?.message ||
+        bt.error?.message
+      )
+    );
+
+    return;
+
+  }
+
+
+  const map = {};
+
+
+  (bt.data || [])
+    .forEach(x => {
+
+      (
+        map[x.base_id] ??= []
+      )
+      .push(
+        x.tag_id
+      );
+
+    });
+
+
+  bases =
+    (b.data || [])
+      .map(x => ({
+
+        ...x,
+
+        tag_ids:
+          map[x.id] || []
+
+      }));
+
+
+  tags =
+    t.data || [];
+
+
+  renderTags();
+
+  renderBases();
+
+}
+
+
+/* =========================
+   RENDER TAGS
+========================= */
+
+function renderTags(){
+
+  $("tagList").innerHTML =
+
+    tags
+      .map(
+        t => `
+
+          <div class="tag-row">
+
+            <span>
+              ${esc(t.name)}
+            </span>
+
+            <div>
+
+              <button
+                class="secondary small"
+                onclick="renameTag('${t.id}')"
+              >
+                แก้ชื่อ
+              </button>
+
+
+              <button
+                class="danger small"
+                onclick="deleteTag('${t.id}')"
+              >
+                ลบ
+              </button>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("")
+
+    ||
+
+    `
+      <div class="muted">
+        ยังไม่มีแท็ก
+      </div>
+    `;
+
+}
+
+
+/* =========================
+   RENDER BASES
+========================= */
+
+function renderBases(){
+
+  $("baseList").innerHTML =
+
+    bases
+      .map(
+        b => `
+
+          <div class="base-row">
+
+            <div>
+
+              <b>
+                ${esc(b.name)}
+              </b>
+
+
+              <div class="muted">
+
+                ${esc(
+                  labels[b.category] ||
+                  b.category ||
+                  ""
+                )}
+
+                ·
+
+                ${Number(b.price) || 0}B
+
+                ·
+
+                ${
+                  b.status === "open"
+                    ? "🟢 เปิดรับ"
+                    : "🔴 ปิดรับ"
+                }
+
+              </div>
+
+
+              <div class="chips">
+
+                ${
+                  b.tag_ids
+                    .map(id => {
+
+                      const t =
+                        tags.find(
+                          x =>
+                            x.id === id
+                        );
+
+                      return t
+                        ? `
+                          <span>
+                            ${esc(t.name)}
+                          </span>
+                        `
+                        : "";
+
+                    })
+                    .join("")
+                }
+
+              </div>
+
+            </div>
+
+
+            <div class="actions">
+
+              <button
+                class="secondary small"
+                onclick="editBase('${b.id}')"
+              >
+                ✏️ แก้ไข
+              </button>
+
+
+              <button
+                class="secondary small"
+                onclick="toggleStatus('${b.id}')"
+              >
+
+                ${
+                  b.status === "open"
+                    ? "🔴 ปิดรับ"
+                    : "🟢 เปิดรับ"
+                }
+
+              </button>
+
+
+              <button
+                class="danger small"
+                onclick="deleteBase('${b.id}')"
+              >
+                ลบ
+              </button>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("")
+
+    ||
+
+    `
+      <div class="muted">
+        ยังไม่มี Base
+      </div>
+    `;
+
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+function openModal(
+  title,
+  html
+){
+
+  $("modalTitle")
+    .textContent =
+      title;
+
+
+  $("modalBody")
+    .innerHTML =
+      html;
+
+
+  $("modal")
+    .classList
+    .add("show");
+
+}
+
+
+function closeModal(){
+
+  $("modal")
+    .classList
+    .remove("show");
+
+}
+
+
+$("closeModal").onclick =
+  closeModal;
+
+
+$("modal").onclick =
+  e => {
+
+    if(
+      e.target ===
+      $("modal")
+    ){
+
+      closeModal();
+
+    }
+
+  };
+
+
+/* =========================
+   NEW TAG
+========================= */
+
+$("newTagBtn").onclick =
+  () =>
+
+    openModal(
+      "เพิ่มแท็ก",
+
+      `
+        <label>
+
+          ชื่อแท็ก
+
+          <input
+            id="tagName"
+          >
+
+        </label>
+
+
+        <button
+          class="primary"
+          onclick="createTag()"
+        >
+          เพิ่มแท็ก
+        </button>
+      `
+    );
+
+
+/* =========================
+   CREATE TAG
+========================= */
+
+async function createTag(){
+
+  const name =
+    $("tagName")
+      .value
+      .trim();
+
+
+  if(!name)
+    return;
+
+
+  const {
+    error
+  } =
+    await sb
+      .from("tags")
+      .insert({
+        name
+      });
+
+
+  if(error){
+
+    alert(
+      "สร้างแท็กไม่สำเร็จ"
+    );
+
+    return;
+
+  }
+
+
+  closeModal();
+
+  load();
+
+}
+
+
+/* =========================
+   RENAME TAG
+========================= */
+
+async function renameTag(id){
+
+  const t =
+    tags.find(
+      x =>
+        x.id === id
+    );
+
+
+  const name =
+    prompt(
+      "ชื่อแท็กใหม่",
+      t.name
+    );
+
+
+  if(
+    !name ||
+    name.trim() === t.name
+  )
+    return;
+
+
+  const {
+    error
+  } =
+    await sb
+      .from("tags")
+      .update({
+        name:
+          name.trim()
+      })
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(error){
+
+    alert(
+      error.message
+    );
+
+  }else{
+
+    load();
+
+  }
+
+}
+
+
+/* =========================
+   DELETE TAG
+========================= */
+
+async function deleteTag(id){
+
+  if(
+    !confirm(
+      "ลบแท็กนี้? การติดแท็กของ Base จะถูกถอดออก"
+    )
+  )
+    return;
+
+
+  const {
+    error
+  } =
+    await sb
+      .from("tags")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(error){
+
+    alert(
+      error.message
+    );
+
+  }else{
+
+    load();
+
+  }
+
+}
+
+
+/* =========================
+   NEW BASE
+========================= */
+
+$("newBaseBtn").onclick =
+  () =>
+    showBaseForm();
+
+
+/* =========================
+   BASE FORM
+========================= */
+
+function showBaseForm(
+  b = null
+){
+
+  const d =
+    (b?.details || [])
+      .join("\n");
+
+
+  const currentStatus =
+    b?.status ||
+    "open";
+
+
+  openModal(
+
+    b
+      ? "แก้ไข Base"
+      : "เพิ่ม Base",
+
+    `
+
+      <label>
+
+        ชื่อ Base
+
+        <input
+          id="fName"
+          value="${esc(
+            b?.name || ""
+          )}"
+          placeholder="เช่น Full body"
+        >
+
+      </label>
+
+
+      <label>
+
+        เครดิต / เจ้าของ
+
+        <input
+          id="fCredit"
+          value="${esc(
+            b?.credit || ""
+          )}"
+          placeholder="เช่น คุณ mew kotchakorn"
+        >
+
+      </label>
+
+
+      <label>
+
+        ราคา (บาท)
+
+        <input
+          id="fPrice"
+          type="number"
+          min="0"
+          value="${Number(
+            b?.price
+          ) || 0}"
+        >
+
+      </label>
+
+
+      <label>
+
+        ประเภท
+
+        <select id="fCat">
+
+          ${
+            Object
+              .entries(labels)
+              .map(
+                ([k,v]) => `
+
+                  <option
+                    value="${k}"
+                    ${
+                      b?.category === k
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    ${v}
+                  </option>
+
+                `
+              )
+              .join("")
+          }
+
+        </select>
+
+      </label>
+
+
+      <label>
+
+        สถานะ
+
+        <select id="fStatus">
+
+          <option
+            value="open"
+            ${
+              currentStatus === "open"
+                ? "selected"
+                : ""
+            }
+          >
+            🟢 เปิดรับ
+          </option>
+
+
+          <option
+            value="closed"
+            ${
+              currentStatus === "closed"
+                ? "selected"
+                : ""
+            }
+          >
+            🔴 ปิดรับ
+          </option>
+
+        </select>
+
+      </label>
+
+
+      <label>
+
+        รายละเอียด
+        (1 บรรทัดต่อ 1 ข้อ)
+
+        <textarea
+          id="fDetails"
+          rows="6"
+          placeholder="เช่น มีสีหน้าให้เลือกถึง 4 สีหน้า"
+        >${esc(d)}</textarea>
+
+      </label>
+
+
+      <label>
+        รูปภาพ Base
+      </label>
+
+
+      <div class="image-box">
+
+        <div class="muted">
+
+          กดเลือกภาพจากมือถือ/คอมได้เลย
+          ไม่ต้องใส่ URL เอง
+
+        </div>
+
+
+        <input
+          id="fImage"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+        >
+
+
+        <div
+          id="fileName"
+          class="file-name"
+        ></div>
+
+
+        <img
+          id="imagePreview"
+          class="preview"
+          alt="ตัวอย่างรูป"
+        >
+
+
+        ${
+          b?.image_url
+            ? `
+              <div
+                class="muted"
+                style="margin-top:8px"
+              >
+                มีรูปเดิมอยู่แล้ว —
+                ถ้าไม่เลือกไฟล์ใหม่จะใช้รูปเดิม
+              </div>
+            `
+            : ""
+        }
+
+
+        <div
+          id="uploadProgress"
+          class="progress"
+        >
+          <i></i>
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          font-weight:700;
+          margin-top:15px
+        "
+      >
+        🏷️ แท็ก
+      </div>
+
+
+      <div class="check-grid">
+
+        ${
+          tags
+            .map(
+              t => `
+
+                <label class="check">
+
+                  <input
+                    type="checkbox"
+                    value="${t.id}"
+                    ${
+                      b?.tag_ids?.includes(t.id)
+                        ? "checked"
+                        : ""
+                    }
+                  >
+
+                  ${esc(t.name)}
+
+                </label>
+
+              `
+            )
+            .join("")
+
+          ||
+
+          `
+            <div class="muted">
+              ยังไม่มีแท็ก
+            </div>
+          `
+        }
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          gap:8px;
+          margin-top:16px
+        "
+      >
+
+        <button
+          class="primary"
+          onclick="saveBase('${b?.id || ""}')"
+        >
+          💾 บันทึก
+        </button>
+
+
+        <button
+          class="secondary"
+          onclick="closeModal()"
+        >
+          ยกเลิก
+        </button>
+
+      </div>
+
+    `
+  );
+
+
+  $("fImage")
+    .addEventListener(
+      "change",
+      () => {
+
+        const file =
+          $("fImage")
+            .files[0];
+
+
+        $("fileName")
+          .textContent =
+            file
+              ? `เลือกรูป: ${file.name}`
+              : "";
+
+
+        if(!file){
+
+          $("imagePreview")
+            .style
+            .display =
+              "none";
+
+          return;
+
+        }
+
+
+        $("imagePreview")
+          .src =
+            URL.createObjectURL(
+              file
+            );
+
+
+        $("imagePreview")
+          .style
+          .display =
+            "block";
+
+      }
+    );
+
+}
+
+
+/* =========================
+   UPLOAD IMAGE
+========================= */
+
+async function uploadImage(
+  file
+){
+
+  const safe =
+    file.name.replace(
+      /[^a-zA-Z0-9._-]/g,
+      "_"
+    );
+
+
+  const path =
+    `${crypto.randomUUID()}-${safe}`;
+
+
+  const {
+    error
+  } =
+    await sb
+      .storage
+      .from(IMAGE_BUCKET)
+      .upload(
+        path,
+        file,
+        {
+          upsert:false
+        }
+      );
+
+
+  if(error)
+    throw error;
+
+
+  return sb
+    .storage
+    .from(IMAGE_BUCKET)
+    .getPublicUrl(path)
+    .data
+    .publicUrl;
+
+}
+
+
+/* =========================
+   SAVE BASE
+========================= */
 
 async function saveBase(id){
-  const b=id?bases.find(x=>x.id===id):null;
-  let image_url=b?.image_url||null;
-  const file=$('fImage').files[0];
+
+  const b =
+    id
+      ? bases.find(
+          x =>
+            x.id === id
+        )
+      : null;
+
+
+  let image_url =
+    b?.image_url ||
+    null;
+
+
+  const file =
+    $("fImage")
+      .files[0];
+
+
   try{
-    if(file){$('uploadProgress').style.display='block';image_url=await uploadImage(file)}
+
+    if(file){
+
+      $("uploadProgress")
+        .style
+        .display =
+          "block";
+
+
+      image_url =
+        await uploadImage(
+          file
+        );
+
+    }
+
   }catch(e){
-    $('uploadProgress').style.display='none';
-    return alert('อัปโหลดรูปไม่สำเร็จ: '+e.message);
+
+    $("uploadProgress")
+      .style
+      .display =
+        "none";
+
+
+    return alert(
+      "อัปโหลดรูปไม่สำเร็จ: " +
+      e.message
+    );
+
   }
-  const payload={
-    name:$('fName').value.trim(),
-    credit:$('fCredit').value.trim(),
-    price:Number($('fPrice').value)||0,
-    category:$('fCat').value,
-    status:$('fStatus').value,
-    details:$('fDetails').value.split(/\n/).map(x=>x.trim()).filter(Boolean),
+
+
+  const payload = {
+
+    name:
+      $("fName")
+        .value
+        .trim(),
+
+    credit:
+      $("fCredit")
+        .value
+        .trim(),
+
+    price:
+      Number(
+        $("fPrice").value
+      ) || 0,
+
+    category:
+      $("fCat").value,
+
+    status:
+      $("fStatus").value,
+
+    details:
+      $("fDetails")
+        .value
+        .split(/\n/)
+        .map(
+          x =>
+            x.trim()
+        )
+        .filter(Boolean),
+
     image_url
+
   };
-  if(!payload.name)return alert('กรุณาใส่ชื่อ Base');
-  let baseId=id;
+
+
+  if(!payload.name){
+
+    return alert(
+      "กรุณาใส่ชื่อ Base"
+    );
+
+  }
+
+
+  let baseId =
+    id;
+
+
+  /* แก้ Base เดิม */
+
   if(id){
-    const {error}=await sb.from('bases').update(payload).eq('id',id);
-    if(error)return alert('บันทึกไม่สำเร็จ: '+error.message);
-  }else{
-    payload.sort_order=bases.length+1;
-    const {data,error}=await sb.from('bases').insert(payload).select().single();
-    if(error)return alert('เพิ่ม Base ไม่สำเร็จ: '+error.message);
-    baseId=data.id;
+
+    const {
+      error
+    } =
+      await sb
+        .from("bases")
+        .update(payload)
+        .eq(
+          "id",
+          id
+        );
+
+
+    if(error){
+
+      return alert(
+        "บันทึกไม่สำเร็จ: " +
+        error.message
+      );
+
+    }
+
   }
-  await sb.from('base_tags').delete().eq('base_id',baseId);
-  const chosen=[...document.querySelectorAll('#modalBody input[type=checkbox]:checked')].map(x=>({base_id:baseId,tag_id:x.value}));
+
+
+  /* เพิ่ม Base ใหม่ */
+
+  else{
+
+    /*
+      สำคัญ:
+      ไม่ส่ง sort_order แล้ว
+      เพราะไม่มี column นี้ใน bases
+    */
+
+    const {
+      data,
+      error
+    } =
+      await sb
+        .from("bases")
+        .insert(
+          payload
+        )
+        .select()
+        .single();
+
+
+    if(error){
+
+      return alert(
+        "เพิ่ม Base ไม่สำเร็จ: " +
+        error.message
+      );
+
+    }
+
+
+    baseId =
+      data.id;
+
+  }
+
+
+  /* จัดการแท็ก */
+
+  await sb
+    .from("base_tags")
+    .delete()
+    .eq(
+      "base_id",
+      baseId
+    );
+
+
+  const chosen =
+    [
+      ...document.querySelectorAll(
+        '#modalBody input[type=checkbox]:checked'
+      )
+    ]
+    .map(
+      x => ({
+
+        base_id:
+          baseId,
+
+        tag_id:
+          x.value
+
+      })
+    );
+
+
   if(chosen.length){
-    const {error}=await sb.from('base_tags').insert(chosen);
-    if(error)return alert('บันทึกแท็กไม่สำเร็จ: '+error.message);
+
+    const {
+      error
+    } =
+      await sb
+        .from("base_tags")
+        .insert(
+          chosen
+        );
+
+
+    if(error){
+
+      return alert(
+        "บันทึกแท็กไม่สำเร็จ: " +
+        error.message
+      );
+
+    }
+
   }
-  closeModal();load();
+
+
+  closeModal();
+
+  load();
+
 }
 
-function editBase(id){showBaseForm(bases.find(x=>x.id===id))}
-async function toggleStatus(id){const b=bases.find(x=>x.id===id);const {error}=await sb.from('bases').update({status:b.status==='open'?'closed':'open'}).eq('id',id);if(error)alert(error.message);else load()}
-async function deleteBase(id){if(!confirm('ลบ Base นี้ถาวรหรือไม่?'))return;const {error}=await sb.from('bases').delete().eq('id',id);if(error)alert(error.message);else load()}
+
+/* =========================
+   EDIT BASE
+========================= */
+
+function editBase(id){
+
+  showBaseForm(
+    bases.find(
+      b =>
+        b.id === id
+    )
+  );
+
+}
+
+
+/* =========================
+   TOGGLE STATUS
+========================= */
+
+async function toggleStatus(
+  id
+){
+
+  const b =
+    bases.find(
+      x =>
+        x.id === id
+    );
+
+
+  const {
+    error
+  } =
+    await sb
+      .from("bases")
+      .update({
+
+        status:
+          b.status === "open"
+            ? "closed"
+            : "open"
+
+      })
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(error){
+
+    alert(
+      error.message
+    );
+
+  }else{
+
+    load();
+
+  }
+
+}
+
+
+/* =========================
+   DELETE BASE
+========================= */
+
+async function deleteBase(
+  id
+){
+
+  if(
+    !confirm(
+      "ลบ Base นี้ถาวรหรือไม่?"
+    )
+  )
+    return;
+
+
+  const {
+    error
+  } =
+    await sb
+      .from("bases")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(error){
+
+    alert(
+      error.message
+    );
+
+  }else{
+
+    load();
+
+  }
+
+}
+
+
+/* =========================
+   START
+========================= */
+
 start();
-</script></body></html>
+
+</script>
+
+
+</body>
+</html>
