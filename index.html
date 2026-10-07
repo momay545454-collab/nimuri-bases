@@ -1,252 +1,168 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nimuri Bases</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <title>Nimuri Bases</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #fff7fb;
-      color: #333;
-    }
-
-    header {
-      padding: 35px 20px;
-      text-align: center;
-      background: #ffffff;
-      border-bottom: 1px solid #f1dce8;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 32px;
-    }
-
-    header p {
-      margin: 8px 0 0;
-      color: #888;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 25px 18px;
-    }
-
-    .search {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid #e8d5df;
-      border-radius: 12px;
-      font-size: 16px;
-      outline: none;
-      background: white;
-    }
-
-    .filters {
-      display: flex;
-      gap: 10px;
-      margin: 15px 0 25px;
-      flex-wrap: wrap;
-    }
-
-    select {
-      padding: 11px 14px;
-      border: 1px solid #e8d5df;
-      border-radius: 10px;
-      background: white;
-      font-size: 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 18px;
-    }
-
-    .card {
-      background: white;
-      border: 1px solid #f0dce6;
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-    }
-
-    .card h2 {
-      margin: 0 0 8px;
-      font-size: 19px;
-    }
-
-    .owner {
-      color: #999;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-
-    .price {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 12px;
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 5px 9px;
-      margin: 3px;
-      border-radius: 20px;
-      background: #fff0f6;
-      color: #c05b88;
-      font-size: 12px;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 50px 10px;
-      color: #999;
-    }
-  </style>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#fff7fb;color:#333}
+header{text-align:center;padding:30px 15px;background:white;border-bottom:1px solid #f1dce8}
+h1{margin:0;font-size:30px}
+header p{color:#888;margin:8px 0 0}
+main{max-width:1100px;margin:auto;padding:20px}
+input,select{padding:13px;border:1px solid #e8d5df;border-radius:10px;background:white;font-size:15px}
+input{width:100%}
+.filters{display:flex;gap:10px;margin:12px 0 18px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:15px}
+.card{background:white;border:1px solid #f0dce6;border-radius:15px;padding:16px;box-shadow:0 3px 12px #00000008}
+.card h2{margin:0 0 7px;font-size:18px}
+.owner{color:#999;font-size:13px;margin-bottom:10px}
+.price{font-size:19px;font-weight:bold;margin-bottom:8px}
+.tag{display:inline-block;padding:4px 8px;margin:2px;border-radius:20px;background:#fff0f6;color:#c05b88;font-size:11px}
+.note{font-size:12px;color:#777;margin-top:8px}
+.count{font-size:13px;color:#999;margin-bottom:12px}
+.center{text-align:center;padding:40px;color:#999}
+.error{background:#fff0f0;color:#c44;padding:15px;border-radius:10px;text-align:center}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <h1>🐱 Nimuri Bases</h1>
-    <p>รวม Base สำหรับใช้งาน</p>
-  </header>
+<header>
+<h1>🐱 Nimuri Bases</h1>
+<p>รวม Base สำหรับใช้งาน</p>
+</header>
 
-  <main class="container">
+<main>
 
-    <input
-      id="search"
-      class="search"
-      type="text"
-      placeholder="🔎 ค้นหา Base..."
-    >
+<input id="search" placeholder="🔎 ค้นหา Base หรือเจ้าของ...">
 
-    <div class="filters">
+<div class="filters">
+<select id="type">
+<option value="">ทุกประเภท</option>
+<option>จิบิเดี่ยว</option>
+<option>จิบิคู่</option>
+<option>สเกลปกติ</option>
+</select>
 
-      <select id="typeFilter">
-        <option value="">ทุกประเภท</option>
-        <option value="จิบิเดี่ยว">จิบิเดี่ยว</option>
-        <option value="จิบิคู่">จิบิคู่</option>
-        <option value="สเกลปกติ">สเกลปกติ</option>
-      </select>
+<select id="price">
+<option value="">ทุกช่วงราคา</option>
+<option value="20">20฿</option>
+<option value="30">30฿</option>
+<option value="40">40฿</option>
+<option value="50">50฿+</option>
+</select>
+</div>
 
-      <select id="priceFilter">
-        <option value="">ทุกช่วงราคา</option>
-        <option value="20">20฿</option>
-        <option value="30">30฿</option>
-        <option value="40">40฿</option>
-        <option value="50">50฿+</option>
-      </select>
+<div id="count" class="count">กำลังโหลด...</div>
+<div id="list" class="grid">
+<div class="center">กำลังโหลด Base... 🐱</div>
+</div>
 
-    </div>
+</main>
 
-    <div id="baseList" class="grid"></div>
+<script>
 
-  </main>
+const db=supabase.createClient(
+"https://ncczyxjtcnchnzvrbtvy.supabase.co",
+"sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm"
+);
 
-  <script>
+let bases=[];
 
-    const bases = [
-      {
-        name: "Full body",
-        owner: "mew kotchakorn",
-        price: 20,
-        type: "จิบิเดี่ยว",
-        tags: ["จิบิเดี่ยว", "เปลี่ยนสีหน้า", "เพิ่มของถือ"]
-      },
-      {
-        name: ":33🐱",
-        owner: "mew kotchakorn",
-        price: 40,
-        type: "สเกลปกติ เดี่ยว",
-        tags: ["สเกลปกติ", "เปลี่ยนสีแมว"]
-      },
-      {
-        name: "แงง",
-        owner: "mew kotchakorn",
-        price: 20,
-        type: "จิบิเดี่ยว",
-        tags: ["จิบิเดี่ยว"]
-      }
-    ];
+const $=id=>document.getElementById(id);
+const search=$("search"),type=$("type"),price=$("price");
+const list=$("list"),count=$("count");
 
-    const list = document.getElementById("baseList");
-    const search = document.getElementById("search");
-    const typeFilter = document.getElementById("typeFilter");
-    const priceFilter = document.getElementById("priceFilter");
+async function load(){
 
-    function render() {
+const {data,error}=await db
+.from("bases_with_tags")
+.select("*")
+.order("id");
 
-      const keyword = search.value.toLowerCase();
-      const type = typeFilter.value;
-      const price = priceFilter.value;
+if(error){
+list.innerHTML='<div class="error">โหลดข้อมูลไม่สำเร็จค่ะ 🥺</div>';
+count.textContent="";
+return;
+}
 
-      const filtered = bases.filter(base => {
+bases=data||[];
+render();
+}
 
-        const matchSearch =
-          base.name.toLowerCase().includes(keyword) ||
-          base.owner.toLowerCase().includes(keyword);
+function render(){
 
-        const matchType =
-          !type || base.type.includes(type);
+let q=search.value.toLowerCase();
+let t=type.value;
+let p=price.value;
 
-        let matchPrice = true;
+let result=bases.filter(b=>{
 
-        if (price === "50") {
-          matchPrice = base.price >= 50;
-        } else if (price) {
-          matchPrice = base.price == Number(price);
-        }
+let okSearch=
+!q||
+String(b.name).toLowerCase().includes(q)||
+String(b.owner_name).toLowerCase().includes(q);
 
-        return matchSearch && matchType && matchPrice;
-      });
+let okType=
+!t||String(b.type||"").includes(t);
 
-      if (filtered.length === 0) {
-        list.innerHTML =
-          '<div class="empty">ไม่พบ Base ที่ค้นหาค่ะ 🥺</div>';
-        return;
-      }
+let okPrice=
+!p||
+p==="50"
+?Number(b.price)>=50
+:Number(b.price)===Number(p);
 
-      list.innerHTML = filtered.map(base => `
-        <div class="card">
+return okSearch&&okType&&okPrice;
+});
 
-          <h2>${base.name}</h2>
+count.textContent=`พบ ${result.length} จาก ${bases.length} Base`;
 
-          <div class="owner">
-            👤 ${base.owner}
-          </div>
+if(!result.length){
+list.innerHTML='<div class="center">ไม่พบ Base ที่ค้นหาค่ะ 🥺</div>';
+return;
+}
 
-          <div class="price">
-            ${base.price}฿
-          </div>
+list.innerHTML=result.map(b=>`
 
-          <div>
-            ${base.tags.map(tag =>
-              `<span class="tag">${tag}</span>`
-            ).join("")}
-          </div>
+<div class="card">
 
-        </div>
-      `).join("");
-    }
+<h2>${b.name||"ไม่มีชื่อ"}</h2>
 
-    search.addEventListener("input", render);
-    typeFilter.addEventListener("change", render);
-    priceFilter.addEventListener("change", render);
+<div class="owner">
+👤 ${b.owner_name||"ไม่ระบุ"}
+</div>
 
-    render();
+<div class="price">
+${b.price}฿
+</div>
 
-  </script>
+${b.commercial_x2?'<div class="note">💼 เชิงพาณิชย์ x2</div>':''}
+
+<div>
+${(b.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}
+</div>
+
+${b.max_orders?`<div class="note">📌 สูงสุด ${b.max_orders} งาน</div>`:""}
+
+${b.notes?`<div class="note">${b.notes}</div>`:""}
+
+</div>
+
+`).join("");
+
+}
+
+search.oninput=render;
+type.onchange=render;
+price.onchange=render;
+
+load();
+
+</script>
 
 </body>
 </html>
