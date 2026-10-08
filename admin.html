@@ -103,7 +103,9 @@ textarea{
   resize:vertical
 }
 
-.primary,.secondary,.danger{
+button.primary,
+button.secondary,
+button.danger{
   border-radius:11px;
   padding:10px 14px
 }
@@ -127,7 +129,7 @@ textarea{
 }
 
 .small{
-  padding:8px 11px;
+  padding:8px 11px !important;
   font-size:12px
 }
 
@@ -261,10 +263,27 @@ textarea{
   font-weight:700
 }
 
+.base-image{
+  width:75px;
+  height:75px;
+  object-fit:cover;
+  border-radius:13px;
+  background:#f8edf2;
+  border:1px solid #efdde5
+}
+
+.base-left{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  min-width:0
+}
+
 @media(max-width:600px){
   header h1{font-size:24px}
 
-  .row,.item{
+  .row,
+  .item{
     align-items:flex-start;
     flex-direction:column
   }
@@ -280,6 +299,10 @@ textarea{
 
   .grid2{
     grid-template-columns:1fr
+  }
+
+  .base-left{
+    width:100%
   }
 }
 </style>
@@ -297,19 +320,28 @@ textarea{
   <!-- LOGIN -->
   <div id="loginBox" class="panel">
 
-    <h2>🔐 เข้าสู่หน้าของเจ้าของ</h2>
+    <h2>🔐 เข้าสู่ระบบ</h2>
 
     <label>
       อีเมล
-      <input id="email" type="email" autocomplete="email">
+      <input
+        id="email"
+        type="email"
+        autocomplete="email">
     </label>
 
     <label>
       รหัสผ่าน
-      <input id="password" type="password" autocomplete="current-password">
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password">
     </label>
 
-    <button class="primary" id="loginBtn">
+    <button
+      class="primary"
+      id="loginBtn"
+      style="margin-top:14px">
       เข้าสู่ระบบ
     </button>
 
@@ -325,12 +357,15 @@ textarea{
 
       <div>
         <b id="who"></b>
+
         <div class="muted">
           จัดการข้อมูล Base ของ NIMURI
         </div>
       </div>
 
-      <button id="logoutBtn" class="secondary">
+      <button
+        id="logoutBtn"
+        class="secondary">
         ออกจากระบบ
       </button>
 
@@ -344,13 +379,18 @@ textarea{
 
         <h2>🏷️ แท็ก</h2>
 
-        <button class="primary small" id="newTagBtn">
+        <button
+          class="primary small"
+          id="newTagBtn">
           + เพิ่มแท็ก
         </button>
 
       </div>
 
-      <div id="tagList" class="list"></div>
+      <div
+        id="tagList"
+        class="list">
+      </div>
 
     </div>
 
@@ -362,13 +402,18 @@ textarea{
 
         <h2>🎨 Bases</h2>
 
-        <button class="primary small" id="newBaseBtn">
+        <button
+          class="primary small"
+          id="newBaseBtn">
           + เพิ่ม Base
         </button>
 
       </div>
 
-      <div id="baseList" class="list"></div>
+      <div
+        id="baseList"
+        class="list">
+      </div>
 
     </div>
 
@@ -378,11 +423,17 @@ textarea{
 
 
 <!-- MODAL -->
-<div id="modal" class="modal">
+<div
+  id="modal"
+  class="modal">
 
   <div class="modal-card">
 
-    <button class="close" id="closeModal">×</button>
+    <button
+      class="close"
+      id="closeModal">
+      ×
+    </button>
 
     <h2 id="modalTitle"></h2>
 
@@ -403,39 +454,81 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm";
 
-const IMAGE_BUCKET = "base-images";
+const IMAGE_BUCKET =
+  "base-images";
 
-let sb;
+let sb = null;
 let bases = [];
 let tags = [];
 let owners = [];
 
-const $ = id => document.getElementById(id);
-
-function esc(s){
-  return String(s ?? '').replace(
-    /[&<>"']/g,
-    m => ({
-      '&':'&amp;',
-      '<':'&lt;',
-      '>':'&gt;',
-      '"':'&quot;',
-      "'":'&#039;'
-    }[m])
-  );
-}
+const $ = id =>
+  document.getElementById(id);
 
 
 /* =========================
-   TYPE LABELS
+   HELPERS
 ========================= */
 
-const typeLabels = {
-  "chibi-single":"จิบิเดี่ยว",
-  "chibi-pair":"จิบิคู่",
-  "normal-single":"สเกลปกติ เดี่ยว",
-  "normal-pair":"สเกลปกติ คู่"
-};
+function esc(value){
+
+  return String(value ?? '')
+    .replace(
+      /[&<>"']/g,
+      char => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#039;'
+      }[char])
+    );
+
+}
+
+
+function typeLabel(type){
+
+  const map = {
+
+    "chibi-single":"จิบิเดี่ยว",
+    "chibi-pair":"จิบิคู่",
+    "normal-single":"สเกลปกติ เดี่ยว",
+    "normal-pair":"สเกลปกติ คู่"
+
+  };
+
+  return map[type] || type || '-';
+
+}
+
+
+function ownerName(id){
+
+  const owner =
+    owners.find(
+      x => String(x.id) === String(id)
+    );
+
+  return owner?.name || 'ไม่ระบุเจ้าของ';
+
+}
+
+
+function publicImageUrl(path){
+
+  if(!path){
+    return '';
+  }
+
+  const result =
+    sb.storage
+      .from(IMAGE_BUCKET)
+      .getPublicUrl(path);
+
+  return result.data?.publicUrl || '';
+
+}
 
 
 /* =========================
@@ -444,26 +537,41 @@ const typeLabels = {
 
 async function start(){
 
-  sb = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+  sb =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
 
   const {
     data:{session}
-  } = await sb.auth.getSession();
+  } =
+    await sb.auth.getSession();
+
 
   if(session){
+
     await showApp(session);
+
+  }else{
+
+    showLogin();
+
   }
 
+
   sb.auth.onAuthStateChange(
-    async (_event,session) => {
+    async (_event,session)=>{
 
       if(session){
+
         await showApp(session);
+
       }else{
+
         showLogin();
+
       }
 
     }
@@ -476,33 +584,45 @@ async function start(){
    LOGIN
 ========================= */
 
-$('loginBtn').onclick = async()=>{
+$('loginBtn').onclick =
+  async()=>{
 
-  $('loginMsg').textContent = '';
+    $('loginMsg').textContent = '';
 
-  const {
-    error
-  } = await sb.auth.signInWithPassword({
+    const email =
+      $('email').value.trim();
 
-    email:$('email').value.trim(),
-
-    password:$('password').value
-
-  });
-
-  if(error){
-    $('loginMsg').textContent =
-      error.message;
-  }
-
-};
+    const password =
+      $('password').value;
 
 
-$('logoutBtn').onclick = async()=>{
+    const {
+      error
+    } =
+      await sb.auth.signInWithPassword({
 
-  await sb.auth.signOut();
+        email,
+        password
 
-};
+      });
+
+
+    if(error){
+
+      $('loginMsg').textContent =
+        error.message;
+
+    }
+
+  };
+
+
+$('logoutBtn').onclick =
+  async()=>{
+
+    await sb.auth.signOut();
+
+  };
 
 
 function showLogin(){
@@ -527,23 +647,24 @@ async function showApp(session){
   $('who').textContent =
     session.user.email || 'เจ้าของ';
 
-  await load();
+  await loadAll();
 
 }
 
 
 /* =========================
-   LOAD
+   LOAD ALL
 ========================= */
 
-async function load(){
+async function loadAll(){
 
   const [
-    b,
-    t,
-    bt,
-    o
-  ] = await Promise.all([
+    basesResult,
+    tagsResult,
+    baseTagsResult,
+    ownersResult
+  ] =
+  await Promise.all([
 
     sb
       .from('bases')
@@ -553,11 +674,11 @@ async function load(){
     sb
       .from('tags')
       .select('*')
-      .order('name'),
+      .order('id'),
 
     sb
       .from('base_tags')
-      .select('base_id,tag_id'),
+      .select('*'),
 
     sb
       .from('owners')
@@ -567,53 +688,91 @@ async function load(){
   ]);
 
 
-  if(
-    b.error ||
-    t.error ||
-    bt.error ||
-    o.error
-  ){
+  if(basesResult.error){
 
     alert(
-      'โหลดข้อมูลไม่สำเร็จ: ' +
-      (
-        b.error?.message ||
-        t.error?.message ||
-        bt.error?.message ||
-        o.error?.message
-      )
+      'โหลด Base ไม่สำเร็จ: ' +
+      basesResult.error.message
     );
 
     return;
+
+  }
+
+
+  if(tagsResult.error){
+
+    alert(
+      'โหลดแท็กไม่สำเร็จ: ' +
+      tagsResult.error.message
+    );
+
+    return;
+
+  }
+
+
+  if(baseTagsResult.error){
+
+    alert(
+      'โหลดความสัมพันธ์แท็กไม่สำเร็จ: ' +
+      baseTagsResult.error.message
+    );
+
+    return;
+
+  }
+
+
+  if(ownersResult.error){
+
+    alert(
+      'โหลดเจ้าของไม่สำเร็จ: ' +
+      ownersResult.error.message
+    );
+
+    return;
+
   }
 
 
   const tagMap = {};
 
-  (bt.data || []).forEach(x=>{
 
-    if(!tagMap[x.base_id]){
-      tagMap[x.base_id] = [];
-    }
+  (baseTagsResult.data || [])
+    .forEach(row=>{
 
-    tagMap[x.base_id].push(x.tag_id);
+      if(!tagMap[row.base_id]){
+        tagMap[row.base_id] = [];
+      }
 
-  });
+      if(row.tag_id != null){
+
+        tagMap[row.base_id]
+          .push(row.tag_id);
+
+      }
+
+    });
 
 
   bases =
-    (b.data || []).map(x=>({
+    (basesResult.data || [])
+      .map(base=>({
 
-      ...x,
+        ...base,
 
-      tag_ids:
-        tagMap[x.id] || []
+        tag_ids:
+          tagMap[base.id] || []
 
-    }));
+      }));
 
 
-  tags = t.data || [];
-  owners = o.data || [];
+  tags =
+    tagsResult.data || [];
+
+  owners =
+    ownersResult.data || [];
 
 
   renderTags();
@@ -623,30 +782,32 @@ async function load(){
 
 
 /* =========================
-   TAGS
+   RENDER TAGS
 ========================= */
 
 function renderTags(){
 
   $('tagList').innerHTML =
 
-    tags.map(t=>`
+    tags.map(tag=>`
 
       <div class="item">
 
-        <b>${esc(t.name)}</b>
+        <b>
+          ${esc(tag.name)}
+        </b>
 
         <div class="actions">
 
           <button
             class="secondary small"
-            onclick="renameTag(${t.id})">
+            onclick="renameTag(${tag.id})">
             แก้ชื่อ
           </button>
 
           <button
             class="danger small"
-            onclick="deleteTag(${t.id})">
+            onclick="deleteTag(${tag.id})">
             ลบ
           </button>
 
@@ -663,204 +824,304 @@ function renderTags(){
 }
 
 
-$('newTagBtn').onclick = ()=>{
+/* =========================
+   CREATE TAG
+========================= */
 
-  openModal(
-    'เพิ่มแท็ก',
-    `
+$('newTagBtn').onclick =
+  ()=>{
 
-      <label>
-        ชื่อแท็ก
-        <input id="tagName">
-      </label>
+    openModal(
 
-      <button
-        class="primary"
-        style="margin-top:14px"
-        onclick="createTag()">
-        เพิ่มแท็ก
-      </button>
+      '🏷️ เพิ่มแท็ก',
 
-    `
-  );
+      `
 
-};
+        <label>
+          ชื่อแท็ก
+
+          <input
+            id="tagName"
+            placeholder="เช่น Cute">
+        </label>
+
+        <button
+          class="primary"
+          style="margin-top:15px"
+          onclick="createTag()">
+
+          เพิ่มแท็ก
+
+        </button>
+
+      `
+
+    );
+
+  };
 
 
 async function createTag(){
 
   const name =
-    $('tagName').value.trim();
+    $('tagName')
+      .value
+      .trim();
+
 
   if(!name){
+
+    alert('กรุณาใส่ชื่อแท็ก');
+
     return;
+
   }
 
-  const {error} =
+
+  const {
+    error
+  } =
     await sb
       .from('tags')
-      .insert({name});
+      .insert({
+        name
+      });
+
 
   if(error){
 
     alert(
-      'สร้างแท็กไม่สำเร็จ: ' +
+      'เพิ่มแท็กไม่สำเร็จ: ' +
       error.message
     );
 
     return;
+
   }
+
 
   closeModal();
-  load();
 
-}
-
-
-async function renameTag(id){
-
-  const tag =
-    tags.find(x => x.id == id);
-
-  if(!tag){
-    return;
-  }
-
-  const name =
-    prompt(
-      'ชื่อแท็กใหม่',
-      tag.name
-    );
-
-  if(
-    !name ||
-    name.trim() === tag.name
-  ){
-    return;
-  }
-
-  const {error} =
-    await sb
-      .from('tags')
-      .update({
-        name:name.trim()
-      })
-      .eq('id',id);
-
-  if(error){
-
-    alert(error.message);
-
-  }else{
-
-    load();
-
-  }
-
-}
-
-
-async function deleteTag(id){
-
-  if(
-    !confirm(
-      'ลบแท็กนี้หรือไม่?'
-    )
-  ){
-    return;
-  }
-
-  const {error} =
-    await sb
-      .from('tags')
-      .delete()
-      .eq('id',id);
-
-  if(error){
-
-    alert(error.message);
-
-  }else{
-
-    load();
-
-  }
+  await loadAll();
 
 }
 
 
 /* =========================
-   BASE LIST
+   RENAME TAG
 ========================= */
 
-function ownerName(id){
+async function renameTag(id){
 
-  const o =
-    owners.find(x => x.id == id);
+  const tag =
+    tags.find(
+      x => String(x.id) === String(id)
+    );
 
-  return o?.name || 'ไม่ระบุเจ้าของ';
+
+  if(!tag){
+    return;
+  }
+
+
+  const newName =
+    prompt(
+      'ชื่อแท็กใหม่',
+      tag.name
+    );
+
+
+  if(
+    !newName ||
+    newName.trim() === tag.name
+  ){
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await sb
+      .from('tags')
+      .update({
+        name:newName.trim()
+      })
+      .eq('id',id);
+
+
+  if(error){
+
+    alert(
+      'แก้ชื่อแท็กไม่สำเร็จ: ' +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadAll();
 
 }
 
+
+/* =========================
+   DELETE TAG
+========================= */
+
+async function deleteTag(id){
+
+  if(
+    !confirm(
+      'ต้องการลบแท็กนี้หรือไม่?'
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await sb
+      .from('tags')
+      .delete()
+      .eq('id',id);
+
+
+  if(error){
+
+    alert(
+      'ลบแท็กไม่สำเร็จ: ' +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadAll();
+
+}
+
+
+/* =========================
+   RENDER BASES
+========================= */
 
 function renderBases(){
 
   $('baseList').innerHTML =
 
-    bases.map(b=>{
+    bases.map(base=>{
 
-      const isOpen =
-        b.status !== 'closed';
+      const open =
+        base.status !== 'closed';
+
+      const image =
+        publicImageUrl(
+          base.image_path
+        );
+
 
       return `
 
         <div class="item">
 
-          <div style="min-width:0">
+          <div class="base-left">
 
-            <b>
-              ${esc(b.name)}
-            </b>
+            ${
+              image
+              ? `
+                <img
+                  class="base-image"
+                  src="${image}"
+                  alt="">
+              `
+              : `
+                <div
+                  class="base-image"
+                  style="
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:25px">
+                  ♡
+                </div>
+              `
+            }
 
-            <div class="muted">
+            <div>
 
-              ${esc(
-                typeLabels[b.type] ||
-                b.type ||
-                '-'
-              )}
+              <b>
+                ${esc(base.name)}
+              </b>
 
-              · ${Number(b.price) || 0} บาท
+              <div class="muted">
 
-              · ${esc(ownerName(b.owner_id))}
+                ${esc(
+                  typeLabel(base.type)
+                )}
 
-            </div>
+                ·
 
-            <div
-              class="${isOpen
-                ? 'status-open'
-                : 'status-closed'}">
+                ${Number(base.price) || 0}
+                บาท
 
-              ${isOpen
-                ? '🟢 เปิดรับ'
-                : '🔴 ปิดรับ'}
+                ·
 
-            </div>
+                ${esc(
+                  ownerName(base.owner_id)
+                )}
 
-            <div class="chips">
+              </div>
 
-              ${
-                b.tag_ids.map(id=>{
 
-                  const t =
-                    tags.find(x=>x.id == id);
+              <div
+                class="${
+                  open
+                  ? 'status-open'
+                  : 'status-closed'
+                }">
 
-                  return t
-                    ? `<span>${esc(t.name)}</span>`
-                    : '';
+                ${
+                  open
+                  ? '🟢 เปิดรับ'
+                  : '🔴 ปิดรับ'
+                }
 
-                }).join('')
-              }
+              </div>
+
+
+              <div class="chips">
+
+                ${
+                  base.tag_ids
+                    .map(tagId=>{
+
+                      const tag =
+                        tags.find(
+                          x =>
+                          String(x.id) ===
+                          String(tagId)
+                        );
+
+                      return tag
+                        ? `<span>${esc(tag.name)}</span>`
+                        : '';
+
+                    })
+                    .join('')
+                }
+
+              </div>
 
             </div>
 
@@ -871,24 +1132,32 @@ function renderBases(){
 
             <button
               class="secondary small"
-              onclick="editBase(${b.id})">
+              onclick="editBase(${base.id})">
+
               ✏️ แก้ไข
+
             </button>
+
 
             <button
               class="secondary small"
-              onclick="toggleStatus(${b.id})">
+              onclick="toggleStatus(${base.id})">
 
-              ${isOpen
+              ${
+                open
                 ? '🔴 ปิดรับ'
-                : '🟢 เปิดรับ'}
+                : '🟢 เปิดรับ'
+              }
 
             </button>
 
+
             <button
               class="danger small"
-              onclick="deleteBase(${b.id})">
+              onclick="deleteBase(${base.id})">
+
               ลบ
+
             </button>
 
           </div>
@@ -934,27 +1203,44 @@ $('closeModal').onclick =
   closeModal;
 
 
-$('modal').onclick = e=>{
+$('modal').onclick =
+  event=>{
 
-  if(e.target === $('modal')){
-    closeModal();
-  }
+    if(
+      event.target ===
+      $('modal')
+    ){
 
-};
+      closeModal();
+
+    }
+
+  };
+
+
+/* =========================
+   NEW BASE
+========================= */
+
+$('newBaseBtn').onclick =
+  ()=>showBaseForm(null);
 
 
 /* =========================
    BASE FORM
 ========================= */
 
-$('newBaseBtn').onclick =
-  ()=>showBaseForm();
+function showBaseForm(base){
 
+  const type =
+    base?.type ||
+    Object.keys({
+      "chibi-single":1,
+      "chibi-pair":1,
+      "normal-single":1,
+      "normal-pair":1
+    })[0];
 
-function showBaseForm(base=null){
-
-  const notes =
-    base?.notes || '';
 
   const status =
     base?.status || 'open';
@@ -969,17 +1255,21 @@ function showBaseForm(base=null){
     `
 
       <label>
+
         ชื่อ Base
+
         <input
           id="fName"
           value="${esc(base?.name || '')}"
           placeholder="ชื่อ Base">
+
       </label>
 
 
       <div class="grid2">
 
         <label>
+
           เจ้าของ
 
           <select id="fOwner">
@@ -989,19 +1279,25 @@ function showBaseForm(base=null){
             </option>
 
             ${
-              owners.map(o=>`
+              owners
+                .map(owner=>`
 
-                <option
-                  value="${o.id}"
-                  ${String(base?.owner_id) === String(o.id)
-                    ? 'selected'
-                    : ''}>
+                  <option
+                    value="${owner.id}"
+                    ${
+                      String(base?.owner_id)
+                      ===
+                      String(owner.id)
+                      ? 'selected'
+                      : ''
+                    }>
 
-                  ${esc(o.name)}
+                    ${esc(owner.name)}
 
-                </option>
+                  </option>
 
-              `).join('')
+                `)
+                .join('')
             }
 
           </select>
@@ -1010,13 +1306,16 @@ function showBaseForm(base=null){
 
 
         <label>
+
           ราคา (บาท)
 
           <input
             id="fPrice"
             type="number"
             min="0"
-            value="${Number(base?.price) || 0}">
+            value="${
+              Number(base?.price) || 0
+            }">
 
         </label>
 
@@ -1026,26 +1325,50 @@ function showBaseForm(base=null){
       <div class="grid2">
 
         <label>
+
           ประเภท
 
           <select id="fType">
 
-            ${
-              Object.entries(typeLabels)
-                .map(([key,label])=>`
+            <option
+              value="chibi-single"
+              ${
+                type === 'chibi-single'
+                ? 'selected'
+                : ''
+              }>
+              จิบิเดี่ยว
+            </option>
 
-                  <option
-                    value="${key}"
-                    ${base?.type === key
-                      ? 'selected'
-                      : ''}>
+            <option
+              value="chibi-pair"
+              ${
+                type === 'chibi-pair'
+                ? 'selected'
+                : ''
+              }>
+              จิบิคู่
+            </option>
 
-                    ${label}
+            <option
+              value="normal-single"
+              ${
+                type === 'normal-single'
+                ? 'selected'
+                : ''
+              }>
+              สเกลปกติ เดี่ยว
+            </option>
 
-                  </option>
-
-                `).join('')
-            }
+            <option
+              value="normal-pair"
+              ${
+                type === 'normal-pair'
+                ? 'selected'
+                : ''
+              }>
+              สเกลปกติ คู่
+            </option>
 
           </select>
 
@@ -1053,13 +1376,16 @@ function showBaseForm(base=null){
 
 
         <label>
+
           จำนวนงานสูงสุด
 
           <input
             id="fMaxOrders"
             type="number"
             min="0"
-            value="${Number(base?.max_orders) || 0}">
+            value="${
+              Number(base?.max_orders) || 0
+            }">
 
         </label>
 
@@ -1074,17 +1400,21 @@ function showBaseForm(base=null){
 
           <option
             value="open"
-            ${status !== 'closed'
+            ${
+              status !== 'closed'
               ? 'selected'
-              : ''}>
+              : ''
+            }>
             🟢 เปิดรับ
           </option>
 
           <option
             value="closed"
-            ${status === 'closed'
+            ${
+              status === 'closed'
               ? 'selected'
-              : ''}>
+              : ''
+            }>
             🔴 ปิดรับ
           </option>
 
@@ -1093,12 +1423,18 @@ function showBaseForm(base=null){
       </label>
 
 
-      <label class="check" style="margin-top:14px">
+      <label
+        class="check"
+        style="margin-top:14px">
 
         <input
           id="fCommercial"
           type="checkbox"
-          ${base?.commercial_x2 ? 'checked' : ''}>
+          ${
+            base?.commercial_x2
+            ? 'checked'
+            : ''
+          }>
 
         Commercial ×2
 
@@ -1112,31 +1448,60 @@ function showBaseForm(base=null){
         <textarea
           id="fNotes"
           rows="6"
-          placeholder="รายละเอียดของ Base">${esc(notes)}</textarea>
+          placeholder="รายละเอียดของ Base">${esc(
+            base?.notes || ''
+          )}</textarea>
 
       </label>
 
 
       <label>
+
         รูปภาพ Base
+
       </label>
 
 
       <div class="image-box">
 
         <div class="muted">
-          เลือกรูปจากมือถือหรือคอมพิวเตอร์ได้เลย
+
+          ${
+            base?.image_path
+            ? 'มีรูปเดิมอยู่แล้ว สามารถเลือกรูปใหม่เพื่อเปลี่ยนได้'
+            : 'เลือกรูปจากมือถือหรือคอมพิวเตอร์ได้เลย'
+          }
+
         </div>
+
 
         <input
           id="fImage"
           type="file"
           accept="image/png,image/jpeg,image/webp,image/gif">
 
+
         <div
           id="fileName"
           class="muted">
         </div>
+
+
+        ${
+          base?.image_path
+          ? `
+            <img
+              id="oldImage"
+              class="preview"
+              src="${publicImageUrl(
+                base.image_path
+              )}"
+              style="display:block"
+              alt="">
+          `
+          : ''
+        }
+
 
         <img
           id="imagePreview"
@@ -1146,36 +1511,51 @@ function showBaseForm(base=null){
       </div>
 
 
-      <div style="margin-top:15px;font-weight:700">
+      <div
+        style="
+          margin-top:16px;
+          font-weight:700">
+
         🏷️ แท็ก
+
       </div>
 
 
       <div
         style="
           display:grid;
-          grid-template-columns:repeat(2,minmax(0,1fr));
+          grid-template-columns:
+            repeat(2,minmax(0,1fr));
           gap:8px;
           margin-top:8px">
 
         ${
-          tags.map(t=>`
+          tags
+            .map(tag=>`
 
-            <label class="check">
+              <label class="check">
 
-              <input
-                type="checkbox"
-                value="${t.id}"
-                ${base?.tag_ids?.includes(t.id)
-                  ? 'checked'
-                  : ''}>
+                <input
+                  type="checkbox"
+                  class="base-tag-checkbox"
+                  data-tag-id="${tag.id}"
+                  ${
+                    base?.tag_ids
+                    ?.map(String)
+                    ?.includes(String(tag.id))
+                    ? 'checked'
+                    : ''
+                  }>
 
-              ${esc(t.name)}
+                ${esc(tag.name)}
 
-            </label>
+              </label>
 
-          `).join('')
+            `)
+            .join('')
+
           ||
+
           '<div class="muted">ยังไม่มีแท็ก</div>'
         }
 
@@ -1190,11 +1570,14 @@ function showBaseForm(base=null){
 
         <button
           class="primary"
-          onclick="saveBase(${base?.id || 'null'})">
+          onclick="saveBase(${
+            base?.id ?? 'null'
+          })">
 
           💾 บันทึก
 
         </button>
+
 
         <button
           class="secondary"
@@ -1217,10 +1600,12 @@ function showBaseForm(base=null){
       const file =
         $('fImage').files[0];
 
+
       $('fileName').textContent =
         file
-          ? `เลือกรูป: ${file.name}`
-          : '';
+        ? `เลือกรูป: ${file.name}`
+        : '';
+
 
       if(!file){
 
@@ -1228,7 +1613,9 @@ function showBaseForm(base=null){
           'none';
 
         return;
+
       }
+
 
       $('imagePreview').src =
         URL.createObjectURL(file);
@@ -1243,23 +1630,28 @@ function showBaseForm(base=null){
 
 
 /* =========================
-   IMAGE UPLOAD
+   UPLOAD IMAGE
 ========================= */
 
 async function uploadImage(file){
 
-  const safe =
-    file.name
-      .replace(
-        /[^a-zA-Z0-9._-]/g,
-        '_'
-      );
+  const extension =
+    (
+      file.name
+        .split('.')
+        .pop() ||
+      'jpg'
+    )
+    .toLowerCase();
+
 
   const path =
-    `${crypto.randomUUID()}-${safe}`;
+    `bases/${crypto.randomUUID()}.${extension}`;
 
 
-  const {error} =
+  const {
+    error
+  } =
     await sb.storage
       .from(IMAGE_BUCKET)
       .upload(
@@ -1273,7 +1665,12 @@ async function uploadImage(file){
 
 
   if(error){
-    throw error;
+
+    throw new Error(
+      'อัปโหลดรูปไม่สำเร็จ: ' +
+      error.message
+    );
+
   }
 
 
@@ -1290,12 +1687,19 @@ async function saveBase(id){
 
   const oldBase =
     id
-      ? bases.find(x => x.id == id)
-      : null;
+    ? bases.find(
+        x =>
+        String(x.id) ===
+        String(id)
+      )
+    : null;
 
 
   const name =
-    $('fName').value.trim();
+    $('fName')
+      .value
+      .trim();
+
 
   if(!name){
 
@@ -1304,6 +1708,7 @@ async function saveBase(id){
     );
 
     return;
+
   }
 
 
@@ -1317,32 +1722,34 @@ async function saveBase(id){
 
     owner_id:
       ownerValue
-        ? Number(ownerValue)
-        : null,
+      ? Number(ownerValue)
+      : null,
 
     price:
-      Number($('fPrice').value) || 0,
+      Number(
+        $('fPrice').value
+      ) || 0,
 
     commercial_x2:
       $('fCommercial').checked,
 
     max_orders:
-      Number($('fMaxOrders').value) || 0,
+      Number(
+        $('fMaxOrders').value
+      ) || 0,
 
     type:
       $('fType').value,
 
     notes:
-      $('fNotes').value.trim(),
+      $('fNotes')
+        .value
+        .trim(),
 
     status:
       $('fStatus').value
 
   };
-
-
-  let imagePath =
-    oldBase?.image_path || null;
 
 
   const file =
@@ -1351,9 +1758,11 @@ async function saveBase(id){
 
   try{
 
+    /* IMAGE */
+
     if(file){
 
-      imagePath =
+      const imagePath =
         await uploadImage(file);
 
       payload.image_path =
@@ -1365,9 +1774,13 @@ async function saveBase(id){
     let baseId;
 
 
+    /* UPDATE */
+
     if(id){
 
-      const {error} =
+      const {
+        error
+      } =
         await sb
           .from('bases')
           .update(payload)
@@ -1383,9 +1796,15 @@ async function saveBase(id){
 
       }
 
+
       baseId = id;
 
-    }else{
+    }
+
+
+    /* INSERT */
+
+    else{
 
       const {
         data,
@@ -1407,58 +1826,91 @@ async function saveBase(id){
 
       }
 
+
       baseId =
         data.id;
 
     }
 
 
-    /* TAGS */
+    /* =====================
+       TAGS
+    ===================== */
 
-    const {error:deleteTagError} =
+    const {
+      error:deleteError
+    } =
       await sb
         .from('base_tags')
         .delete()
-        .eq('base_id',baseId);
+        .eq(
+          'base_id',
+          baseId
+        );
 
 
-    if(deleteTagError){
+    if(deleteError){
 
       throw new Error(
-        'จัดการแท็กไม่สำเร็จ: ' +
-        deleteTagError.message
+        'ล้างแท็กเดิมไม่สำเร็จ: ' +
+        deleteError.message
       );
 
     }
 
 
-    const chosen =
+    /*
+      สำคัญ:
+      เลือกเฉพาะ checkbox
+      ที่เป็นแท็กจริง ๆ
+      ไม่เอา Commercial ×2
+    */
+
+    const selectedTagIds =
       [
         ...document.querySelectorAll(
-          '#modalBody input[type=checkbox]:checked'
+          '#modalBody .base-tag-checkbox:checked'
         )
-      ].map(x=>({
+      ]
+      .map(
+        checkbox =>
+          Number(
+            checkbox.dataset.tagId
+          )
+      )
+      .filter(
+        tagId =>
+          Number.isFinite(tagId)
+      );
 
-        base_id:baseId,
 
-        tag_id:Number(x.value)
+    if(selectedTagIds.length){
 
-      }));
+      const rows =
+        selectedTagIds.map(
+          tagId => ({
+
+            base_id:baseId,
+
+            tag_id:tagId
+
+          })
+        );
 
 
-    if(chosen.length){
-
-      const {error} =
+      const {
+        error:tagError
+      } =
         await sb
           .from('base_tags')
-          .insert(chosen);
+          .insert(rows);
 
 
-      if(error){
+      if(tagError){
 
         throw new Error(
           'บันทึกแท็กไม่สำเร็จ: ' +
-          error.message
+          tagError.message
         );
 
       }
@@ -1468,17 +1920,18 @@ async function saveBase(id){
 
     closeModal();
 
-    await load();
+    await loadAll();
 
 
     alert(
       id
-        ? 'บันทึก Base เรียบร้อยแล้ว ♡'
-        : 'เพิ่ม Base เรียบร้อยแล้ว ♡'
+      ? 'บันทึก Base เรียบร้อยแล้ว ♡'
+      : 'เพิ่ม Base เรียบร้อยแล้ว ♡'
     );
 
+  }
 
-  }catch(error){
+  catch(error){
 
     alert(
       error.message
@@ -1490,46 +1943,60 @@ async function saveBase(id){
 
 
 /* =========================
-   EDIT
+   EDIT BASE
 ========================= */
 
 function editBase(id){
 
   const base =
-    bases.find(x => x.id == id);
+    bases.find(
+      x =>
+      String(x.id) ===
+      String(id)
+    );
+
 
   if(base){
+
     showBaseForm(base);
+
   }
 
 }
 
 
 /* =========================
-   STATUS
+   TOGGLE STATUS
 ========================= */
 
 async function toggleStatus(id){
 
   const base =
-    bases.find(x => x.id == id);
+    bases.find(
+      x =>
+      String(x.id) ===
+      String(id)
+    );
+
 
   if(!base){
     return;
   }
 
 
-  const next =
+  const nextStatus =
     base.status === 'closed'
-      ? 'open'
-      : 'closed';
+    ? 'open'
+    : 'closed';
 
 
-  const {error} =
+  const {
+    error
+  } =
     await sb
       .from('bases')
       .update({
-        status:next
+        status:nextStatus
       })
       .eq('id',id);
 
@@ -1542,16 +2009,17 @@ async function toggleStatus(id){
     );
 
     return;
+
   }
 
 
-  await load();
+  await loadAll();
 
 }
 
 
 /* =========================
-   DELETE
+   DELETE BASE
 ========================= */
 
 async function deleteBase(id){
@@ -1567,7 +2035,38 @@ async function deleteBase(id){
   }
 
 
-  const {error} =
+  /*
+    ลบความสัมพันธ์แท็กก่อน
+  */
+
+  const {
+    error:tagError
+  } =
+    await sb
+      .from('base_tags')
+      .delete()
+      .eq('base_id',id);
+
+
+  if(tagError){
+
+    alert(
+      'ล้างแท็กของ Base ไม่สำเร็จ: ' +
+      tagError.message
+    );
+
+    return;
+
+  }
+
+
+  /*
+    ลบ Base
+  */
+
+  const {
+    error
+  } =
     await sb
       .from('bases')
       .delete()
@@ -1582,10 +2081,16 @@ async function deleteBase(id){
     );
 
     return;
+
   }
 
 
-  await load();
+  await loadAll();
+
+
+  alert(
+    'ลบ Base เรียบร้อยแล้ว'
+  );
 
 }
 
