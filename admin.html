@@ -7,6 +7,7 @@
 
 <style>
 *{box-sizing:border-box}
+
 :root{
   --bg:#fff7fb;
   --white:#fff;
@@ -17,6 +18,7 @@
   --muted:#9b858e;
   --dark:#44373e
 }
+
 body{
   margin:0;
   background:var(--bg);
@@ -24,12 +26,31 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
   font-size:14px
 }
+
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
-header{text-align:center;padding:30px 16px 22px}
-header h1{margin:0;font-size:27px}
-header p{margin:7px 0 0;color:var(--muted)}
-.admin-wrap{width:min(100%,980px);margin:auto;padding:0 14px 50px}
+
+header{
+  text-align:center;
+  padding:30px 16px 22px
+}
+
+header h1{
+  margin:0;
+  font-size:27px
+}
+
+header p{
+  margin:7px 0 0;
+  color:var(--muted)
+}
+
+.wrap{
+  width:min(100%,980px);
+  margin:auto;
+  padding:0 14px 50px
+}
+
 .panel{
   background:#fff;
   border:1px solid var(--line);
@@ -38,11 +59,35 @@ header p{margin:7px 0 0;color:var(--muted)}
   margin-bottom:16px;
   box-shadow:0 6px 22px rgba(150,100,125,.06)
 }
-.row{display:flex;gap:10px;align-items:center}
-.between{justify-content:space-between}
-h2{margin:0 0 8px;font-size:18px}
-.muted{color:var(--muted);font-size:13px;line-height:1.5}
-label{display:block;font-weight:700;font-size:13px;margin:12px 0 0}
+
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center
+}
+
+.between{
+  justify-content:space-between
+}
+
+h2{
+  margin:0 0 8px;
+  font-size:18px
+}
+
+.muted{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5
+}
+
+label{
+  display:block;
+  font-weight:700;
+  font-size:13px;
+  margin:12px 0 0
+}
+
 input,select,textarea{
   width:100%;
   margin-top:6px;
@@ -53,24 +98,50 @@ input,select,textarea{
   color:var(--text);
   outline:none
 }
-textarea{resize:vertical}
+
+textarea{
+  resize:vertical
+}
+
 .primary,.secondary,.danger{
   border-radius:11px;
   padding:10px 14px
 }
-.primary{background:var(--dark);color:#fff;border:0}
-.secondary{background:#fff;border:1px solid #e6ccd8;color:#725d67}
-.danger{background:#fff0f2;color:#c65d70;border:1px solid #f0cbd2}
-.small{padding:8px 11px;font-size:12px}
-.msg{color:#b35f84;min-height:18px}
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  align-items:center
+
+.primary{
+  background:var(--dark);
+  color:#fff;
+  border:0
 }
-.admin-list,.tag-admin{display:grid;gap:10px}
-.base-row,.tag-row{
+
+.secondary{
+  background:#fff;
+  border:1px solid #e6ccd8;
+  color:#725d67
+}
+
+.danger{
+  background:#fff0f2;
+  color:#c65d70;
+  border:1px solid #f0cbd2
+}
+
+.small{
+  padding:8px 11px;
+  font-size:12px
+}
+
+.msg{
+  color:#b35f84;
+  min-height:18px
+}
+
+.list{
+  display:grid;
+  gap:10px
+}
+
+.item{
   border:1px solid #f0dfe6;
   border-radius:15px;
   padding:13px;
@@ -79,25 +150,29 @@ textarea{resize:vertical}
   gap:12px;
   align-items:center
 }
+
 .actions{
   display:flex;
   gap:7px;
   flex-wrap:wrap;
   justify-content:flex-end
 }
+
 .chips{
   display:flex;
   gap:6px;
   flex-wrap:wrap;
   margin-top:7px
 }
-.chips span,.tag{
+
+.chips span{
   background:#fff0f6;
   color:#bd6289;
   border-radius:999px;
   padding:4px 8px;
   font-size:11px
 }
+
 .modal{
   position:fixed;
   inset:0;
@@ -108,9 +183,13 @@ textarea{resize:vertical}
   padding:10px;
   z-index:20
 }
-.modal.show{display:flex}
+
+.modal.show{
+  display:flex
+}
+
 .modal-card{
-  width:min(100%,650px);
+  width:min(100%,680px);
   max-height:92vh;
   overflow:auto;
   background:#fff;
@@ -118,7 +197,8 @@ textarea{resize:vertical}
   padding:18px;
   position:relative
 }
-.modal-x{
+
+.close{
   position:absolute;
   right:12px;
   top:10px;
@@ -130,23 +210,29 @@ textarea{resize:vertical}
   font-size:22px;
   color:#7d6570
 }
-.check-grid{
+
+.grid2{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-  margin-top:8px
+  grid-template-columns:1fr 1fr;
+  gap:10px
 }
+
 .check{
-  font-weight:500;
+  display:flex;
+  align-items:center;
+  gap:7px;
   background:#fff8fb;
   border:1px solid #efdde5;
   border-radius:10px;
-  padding:9px
+  padding:9px;
+  font-weight:500
 }
+
 .check input{
   width:auto;
-  margin:0 6px 0 0
+  margin:0
 }
+
 .image-box{
   border:1px dashed #e6bfd0;
   border-radius:15px;
@@ -154,6 +240,7 @@ textarea{resize:vertical}
   margin-top:7px;
   background:#fffafd
 }
+
 .preview{
   width:100%;
   max-height:260px;
@@ -163,42 +250,37 @@ textarea{resize:vertical}
   margin-top:9px;
   display:none
 }
-.file-name{
-  color:var(--muted);
-  font-size:12px;
-  word-break:break-all
+
+.status-open{
+  color:#27885c;
+  font-weight:700
 }
-.progress{
-  height:7px;
-  background:#f3e4ea;
-  border-radius:99px;
-  overflow:hidden;
-  margin-top:10px;
-  display:none
+
+.status-closed{
+  color:#c65d70;
+  font-weight:700
 }
-.progress i{
-  display:block;
-  width:35%;
-  height:100%;
-  background:var(--pink);
-  animation:move 1s infinite alternate
-}
-@keyframes move{
-  from{transform:translateX(0)}
-  to{transform:translateX(180%)}
-}
+
 @media(max-width:600px){
   header h1{font-size:24px}
-  .topbar,.base-row,.tag-row{
+
+  .row,.item{
     align-items:flex-start;
     flex-direction:column
   }
+
   .actions{
     width:100%;
     justify-content:flex-start
   }
-  .actions button{flex:1}
-  .check-grid{grid-template-columns:1fr}
+
+  .actions button{
+    flex:1
+  }
+
+  .grid2{
+    grid-template-columns:1fr
+  }
 }
 </style>
 </head>
@@ -210,9 +292,11 @@ textarea{resize:vertical}
   <p>จัดการ Bases</p>
 </header>
 
-<div class="admin-wrap">
+<div class="wrap">
 
+  <!-- LOGIN -->
   <div id="loginBox" class="panel">
+
     <h2>🔐 เข้าสู่หน้าของเจ้าของ</h2>
 
     <label>
@@ -225,56 +309,89 @@ textarea{resize:vertical}
       <input id="password" type="password" autocomplete="current-password">
     </label>
 
-    <button class="primary" id="loginBtn">เข้าสู่ระบบ</button>
+    <button class="primary" id="loginBtn">
+      เข้าสู่ระบบ
+    </button>
 
     <p id="loginMsg" class="msg"></p>
+
   </div>
 
+
+  <!-- APP -->
   <div id="app" style="display:none">
 
-    <div class="panel topbar">
+    <div class="panel row between">
+
       <div>
         <b id="who"></b>
-        <div class="muted">เฉพาะบัญชีเจ้าของที่ได้รับสิทธิ์เท่านั้น</div>
+        <div class="muted">
+          จัดการข้อมูล Base ของ NIMURI
+        </div>
       </div>
 
       <button id="logoutBtn" class="secondary">
         ออกจากระบบ
       </button>
+
     </div>
 
+
+    <!-- TAGS -->
     <div class="panel">
+
       <div class="row between">
+
         <h2>🏷️ แท็ก</h2>
+
         <button class="primary small" id="newTagBtn">
           + เพิ่มแท็ก
         </button>
+
       </div>
 
-      <div id="tagList" class="tag-admin"></div>
+      <div id="tagList" class="list"></div>
+
     </div>
 
+
+    <!-- BASES -->
     <div class="panel">
+
       <div class="row between">
+
         <h2>🎨 Bases</h2>
+
         <button class="primary small" id="newBaseBtn">
           + เพิ่ม Base
         </button>
+
       </div>
 
-      <div id="baseList" class="admin-list"></div>
+      <div id="baseList" class="list"></div>
+
     </div>
 
   </div>
+
 </div>
 
+
+<!-- MODAL -->
 <div id="modal" class="modal">
+
   <div class="modal-card">
-    <button class="modal-x" id="closeModal">×</button>
+
+    <button class="close" id="closeModal">×</button>
+
     <h2 id="modalTitle"></h2>
+
     <div id="modalBody"></div>
+
   </div>
+
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -288,21 +405,15 @@ const SUPABASE_KEY =
 
 const IMAGE_BUCKET = "base-images";
 
-let sb = null;
+let sb;
 let bases = [];
 let tags = [];
-
-const labels = {
-  "chibi-single":"จิบิเดี่ยว",
-  "chibi-pair":"จิบิคู่",
-  "normal-single":"สเกลปกติ เดี่ยว",
-  "normal-pair":"สเกลปกติ คู่"
-};
+let owners = [];
 
 const $ = id => document.getElementById(id);
 
-const esc = s =>
-  String(s ?? '').replace(
+function esc(s){
+  return String(s ?? '').replace(
     /[&<>"']/g,
     m => ({
       '&':'&amp;',
@@ -312,6 +423,24 @@ const esc = s =>
       "'":'&#039;'
     }[m])
   );
+}
+
+
+/* =========================
+   TYPE LABELS
+========================= */
+
+const typeLabels = {
+  "chibi-single":"จิบิเดี่ยว",
+  "chibi-pair":"จิบิคู่",
+  "normal-single":"สเกลปกติ เดี่ยว",
+  "normal-pair":"สเกลปกติ คู่"
+};
+
+
+/* =========================
+   START
+========================= */
 
 async function start(){
 
@@ -329,72 +458,120 @@ async function start(){
   }
 
   sb.auth.onAuthStateChange(
-    (_e,s) => s ? showApp(s) : showLogin()
+    async (_event,session) => {
+
+      if(session){
+        await showApp(session);
+      }else{
+        showLogin();
+      }
+
+    }
   );
-}
-
-async function showApp(s){
-
-  $('loginBox').style.display='none';
-  $('app').style.display='block';
-
-  $('who').textContent =
-    s.user.email || 'เจ้าของ';
-
-  await load();
-}
-
-function showLogin(){
-
-  $('loginBox').style.display='block';
-  $('app').style.display='none';
 
 }
+
+
+/* =========================
+   LOGIN
+========================= */
 
 $('loginBtn').onclick = async()=>{
+
+  $('loginMsg').textContent = '';
 
   const {
     error
   } = await sb.auth.signInWithPassword({
-    email:$('email').value,
+
+    email:$('email').value.trim(),
+
     password:$('password').value
+
   });
 
-  $('loginMsg').textContent =
-    error ? error.message : '';
+  if(error){
+    $('loginMsg').textContent =
+      error.message;
+  }
+
 };
 
-$('logoutBtn').onclick =
-  () => sb.auth.signOut();
+
+$('logoutBtn').onclick = async()=>{
+
+  await sb.auth.signOut();
+
+};
+
+
+function showLogin(){
+
+  $('loginBox').style.display =
+    'block';
+
+  $('app').style.display =
+    'none';
+
+}
+
+
+async function showApp(session){
+
+  $('loginBox').style.display =
+    'none';
+
+  $('app').style.display =
+    'block';
+
+  $('who').textContent =
+    session.user.email || 'เจ้าของ';
+
+  await load();
+
+}
 
 
 /* =========================
-   LOAD DATA
-   ========================= */
+   LOAD
+========================= */
 
 async function load(){
 
-  const b =
-    await sb
+  const [
+    b,
+    t,
+    bt,
+    o
+  ] = await Promise.all([
+
+    sb
       .from('bases')
       .select('*')
-      .order('id');
+      .order('id'),
 
-  const t =
-    await sb
+    sb
       .from('tags')
       .select('*')
-      .order('name');
+      .order('name'),
 
-  const bt =
-    await sb
+    sb
       .from('base_tags')
-      .select('base_id,tag_id');
+      .select('base_id,tag_id'),
+
+    sb
+      .from('owners')
+      .select('*')
+      .order('id')
+
+  ]);
+
 
   if(
     b.error ||
     t.error ||
-    bt.error
+    bt.error ||
+    o.error
   ){
 
     alert(
@@ -402,127 +579,74 @@ async function load(){
       (
         b.error?.message ||
         t.error?.message ||
-        bt.error?.message
+        bt.error?.message ||
+        o.error?.message
       )
     );
 
     return;
   }
 
-  const map = {};
 
-  (bt.data || []).forEach(x =>
-    (map[x.base_id] ??= []).push(x.tag_id)
-  );
+  const tagMap = {};
+
+  (bt.data || []).forEach(x=>{
+
+    if(!tagMap[x.base_id]){
+      tagMap[x.base_id] = [];
+    }
+
+    tagMap[x.base_id].push(x.tag_id);
+
+  });
+
 
   bases =
-    (b.data || []).map(x => ({
+    (b.data || []).map(x=>({
+
       ...x,
-      tag_ids:map[x.id] || []
+
+      tag_ids:
+        tagMap[x.id] || []
+
     }));
 
+
   tags = t.data || [];
+  owners = o.data || [];
+
 
   renderTags();
   renderBases();
+
 }
 
 
 /* =========================
    TAGS
-   ========================= */
+========================= */
 
 function renderTags(){
 
   $('tagList').innerHTML =
-    tags.map(t => `
-      <div class="tag-row">
 
-        <span>${esc(t.name)}</span>
+    tags.map(t=>`
 
-        <div>
+      <div class="item">
 
-          <button
-            class="secondary small"
-            onclick="renameTag('${t.id}')">
-            แก้ชื่อ
-          </button>
-
-          <button
-            class="danger small"
-            onclick="deleteTag('${t.id}')">
-            ลบ
-          </button>
-
-        </div>
-
-      </div>
-    `).join('') ||
-
-    '<div class="muted">ยังไม่มีแท็ก</div>';
-}
-
-
-/* =========================
-   BASE LIST
-   ========================= */
-
-function renderBases(){
-
-  $('baseList').innerHTML =
-
-    bases.map(b => `
-
-      <div class="base-row">
-
-        <div>
-
-          <b>${esc(b.name)}</b>
-
-          <div class="muted">
-            ${esc(labels[b.category] || b.category)}
-            · ${Number(b.price) || 0}B
-            · ${b.status === 'open'
-              ? '🟢 เปิดรับ'
-              : '🔴 ปิดรับ'}
-          </div>
-
-          <div class="chips">
-
-            ${b.tag_ids.map(id => {
-
-              const t =
-                tags.find(x => x.id === id);
-
-              return t
-                ? `<span>${esc(t.name)}</span>`
-                : '';
-
-            }).join('')}
-
-          </div>
-
-        </div>
+        <b>${esc(t.name)}</b>
 
         <div class="actions">
 
           <button
             class="secondary small"
-            onclick="editBase('${b.id}')">
-            ✏️ แก้ไข
-          </button>
-
-          <button
-            class="secondary small"
-            onclick="toggleStatus('${b.id}')">
-            ${b.status === 'open'
-              ? '🔴 ปิดรับ'
-              : '🟢 เปิดรับ'}
+            onclick="renameTag(${t.id})">
+            แก้ชื่อ
           </button>
 
           <button
             class="danger small"
-            onclick="deleteBase('${b.id}')">
+            onclick="deleteTag(${t.id})">
             ลบ
           </button>
 
@@ -530,50 +654,21 @@ function renderBases(){
 
       </div>
 
-    `).join('') ||
+    `).join('')
 
-    '<div class="muted">ยังไม่มี Base</div>';
-}
+    ||
 
-
-/* =========================
-   MODAL
-   ========================= */
-
-function openModal(title,html){
-
-  $('modalTitle').textContent = title;
-  $('modalBody').innerHTML = html;
-  $('modal').classList.add('show');
+    '<div class="muted">ยังไม่มีแท็ก</div>';
 
 }
 
-function closeModal(){
 
-  $('modal').classList.remove('show');
-
-}
-
-$('closeModal').onclick = closeModal;
-
-$('modal').onclick = e => {
-
-  if(e.target === $('modal')){
-    closeModal();
-  }
-
-};
-
-
-/* =========================
-   TAG CREATE
-   ========================= */
-
-$('newTagBtn').onclick = () =>
+$('newTagBtn').onclick = ()=>{
 
   openModal(
     'เพิ่มแท็ก',
     `
+
       <label>
         ชื่อแท็ก
         <input id="tagName">
@@ -581,11 +676,15 @@ $('newTagBtn').onclick = () =>
 
       <button
         class="primary"
+        style="margin-top:14px"
         onclick="createTag()">
         เพิ่มแท็ก
       </button>
+
     `
   );
+
+};
 
 
 async function createTag(){
@@ -593,7 +692,9 @@ async function createTag(){
   const name =
     $('tagName').value.trim();
 
-  if(!name)return;
+  if(!name){
+    return;
+  }
 
   const {error} =
     await sb
@@ -601,25 +702,39 @@ async function createTag(){
       .insert({name});
 
   if(error){
-    return alert('สร้างแท็กไม่สำเร็จ');
+
+    alert(
+      'สร้างแท็กไม่สำเร็จ: ' +
+      error.message
+    );
+
+    return;
   }
 
   closeModal();
   load();
+
 }
 
 
 async function renameTag(id){
 
-  const t =
-    tags.find(x => x.id === id);
+  const tag =
+    tags.find(x => x.id == id);
+
+  if(!tag){
+    return;
+  }
 
   const name =
-    prompt('ชื่อแท็กใหม่',t.name);
+    prompt(
+      'ชื่อแท็กใหม่',
+      tag.name
+    );
 
   if(
     !name ||
-    name.trim() === t.name
+    name.trim() === tag.name
   ){
     return;
   }
@@ -633,10 +748,15 @@ async function renameTag(id){
       .eq('id',id);
 
   if(error){
+
     alert(error.message);
+
   }else{
+
     load();
+
   }
+
 }
 
 
@@ -644,7 +764,7 @@ async function deleteTag(id){
 
   if(
     !confirm(
-      'ลบแท็กนี้? การติดแท็กของ Base จะถูกถอดออก'
+      'ลบแท็กนี้หรือไม่?'
     )
   ){
     return;
@@ -657,34 +777,194 @@ async function deleteTag(id){
       .eq('id',id);
 
   if(error){
+
     alert(error.message);
+
   }else{
+
     load();
+
   }
+
 }
 
 
 /* =========================
+   BASE LIST
+========================= */
+
+function ownerName(id){
+
+  const o =
+    owners.find(x => x.id == id);
+
+  return o?.name || 'ไม่ระบุเจ้าของ';
+
+}
+
+
+function renderBases(){
+
+  $('baseList').innerHTML =
+
+    bases.map(b=>{
+
+      const isOpen =
+        b.status !== 'closed';
+
+      return `
+
+        <div class="item">
+
+          <div style="min-width:0">
+
+            <b>
+              ${esc(b.name)}
+            </b>
+
+            <div class="muted">
+
+              ${esc(
+                typeLabels[b.type] ||
+                b.type ||
+                '-'
+              )}
+
+              · ${Number(b.price) || 0} บาท
+
+              · ${esc(ownerName(b.owner_id))}
+
+            </div>
+
+            <div
+              class="${isOpen
+                ? 'status-open'
+                : 'status-closed'}">
+
+              ${isOpen
+                ? '🟢 เปิดรับ'
+                : '🔴 ปิดรับ'}
+
+            </div>
+
+            <div class="chips">
+
+              ${
+                b.tag_ids.map(id=>{
+
+                  const t =
+                    tags.find(x=>x.id == id);
+
+                  return t
+                    ? `<span>${esc(t.name)}</span>`
+                    : '';
+
+                }).join('')
+              }
+
+            </div>
+
+          </div>
+
+
+          <div class="actions">
+
+            <button
+              class="secondary small"
+              onclick="editBase(${b.id})">
+              ✏️ แก้ไข
+            </button>
+
+            <button
+              class="secondary small"
+              onclick="toggleStatus(${b.id})">
+
+              ${isOpen
+                ? '🔴 ปิดรับ'
+                : '🟢 เปิดรับ'}
+
+            </button>
+
+            <button
+              class="danger small"
+              onclick="deleteBase(${b.id})">
+              ลบ
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join('')
+
+    ||
+
+    '<div class="muted">ยังไม่มี Base</div>';
+
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+function openModal(title,html){
+
+  $('modalTitle').textContent =
+    title;
+
+  $('modalBody').innerHTML =
+    html;
+
+  $('modal').classList.add('show');
+
+}
+
+
+function closeModal(){
+
+  $('modal').classList.remove('show');
+
+}
+
+
+$('closeModal').onclick =
+  closeModal;
+
+
+$('modal').onclick = e=>{
+
+  if(e.target === $('modal')){
+    closeModal();
+  }
+
+};
+
+
+/* =========================
    BASE FORM
-   ========================= */
+========================= */
 
 $('newBaseBtn').onclick =
-  () => showBaseForm();
+  ()=>showBaseForm();
 
 
-function showBaseForm(b=null){
+function showBaseForm(base=null){
 
-  const d =
-    (b?.details || []).join('\n');
+  const notes =
+    base?.notes || '';
 
-  const currentStatus =
-    b?.status || 'open';
+  const status =
+    base?.status || 'open';
+
 
   openModal(
 
-    b
-      ? 'แก้ไข Base'
-      : 'เพิ่ม Base',
+    base
+      ? '✏️ แก้ไข Base'
+      : '✨ เพิ่ม Base',
 
     `
 
@@ -692,56 +972,109 @@ function showBaseForm(b=null){
         ชื่อ Base
         <input
           id="fName"
-          value="${esc(b?.name || '')}"
-          placeholder="เช่น Full body">
+          value="${esc(base?.name || '')}"
+          placeholder="ชื่อ Base">
       </label>
 
-      <label>
-        เครดิต / เจ้าของ
-        <input
-          id="fCredit"
-          value="${esc(b?.credit || '')}"
-          placeholder="เช่น คุณ mew kotchakorn">
-      </label>
 
-      <label>
-        ราคา (บาท)
-        <input
-          id="fPrice"
-          type="number"
-          min="0"
-          value="${Number(b?.price) || 0}">
-      </label>
+      <div class="grid2">
 
-      <label>
-        ประเภท
+        <label>
+          เจ้าของ
 
-        <select id="fCat">
+          <select id="fOwner">
 
-          ${
-            Object.entries(labels)
-              .map(([k,v]) => `
+            <option value="">
+              — เลือกเจ้าของ —
+            </option>
+
+            ${
+              owners.map(o=>`
+
                 <option
-                  value="${k}"
-                  ${b?.category === k ? 'selected' : ''}>
-                  ${v}
+                  value="${o.id}"
+                  ${String(base?.owner_id) === String(o.id)
+                    ? 'selected'
+                    : ''}>
+
+                  ${esc(o.name)}
+
                 </option>
-              `)
-              .join('')
-          }
 
-        </select>
+              `).join('')
+            }
 
-      </label>
+          </select>
+
+        </label>
+
+
+        <label>
+          ราคา (บาท)
+
+          <input
+            id="fPrice"
+            type="number"
+            min="0"
+            value="${Number(base?.price) || 0}">
+
+        </label>
+
+      </div>
+
+
+      <div class="grid2">
+
+        <label>
+          ประเภท
+
+          <select id="fType">
+
+            ${
+              Object.entries(typeLabels)
+                .map(([key,label])=>`
+
+                  <option
+                    value="${key}"
+                    ${base?.type === key
+                      ? 'selected'
+                      : ''}>
+
+                    ${label}
+
+                  </option>
+
+                `).join('')
+            }
+
+          </select>
+
+        </label>
+
+
+        <label>
+          จำนวนงานสูงสุด
+
+          <input
+            id="fMaxOrders"
+            type="number"
+            min="0"
+            value="${Number(base?.max_orders) || 0}">
+
+        </label>
+
+      </div>
+
 
       <label>
-        สถานะ
+
+        สถานะรับงาน
 
         <select id="fStatus">
 
           <option
             value="open"
-            ${currentStatus === 'open'
+            ${status !== 'closed'
               ? 'selected'
               : ''}>
             🟢 เปิดรับ
@@ -749,7 +1082,7 @@ function showBaseForm(b=null){
 
           <option
             value="closed"
-            ${currentStatus === 'closed'
+            ${status === 'closed'
               ? 'selected'
               : ''}>
             🔴 ปิดรับ
@@ -759,26 +1092,40 @@ function showBaseForm(b=null){
 
       </label>
 
-      <label>
-        รายละเอียด
-        (1 บรรทัดต่อ 1 ข้อ)
 
-        <textarea
-          id="fDetails"
-          rows="6"
-          placeholder="เช่น มีสีหน้าให้เลือกถึง 4 สีหน้า">${esc(d)}</textarea>
+      <label class="check" style="margin-top:14px">
+
+        <input
+          id="fCommercial"
+          type="checkbox"
+          ${base?.commercial_x2 ? 'checked' : ''}>
+
+        Commercial ×2
 
       </label>
+
+
+      <label>
+
+        รายละเอียด
+
+        <textarea
+          id="fNotes"
+          rows="6"
+          placeholder="รายละเอียดของ Base">${esc(notes)}</textarea>
+
+      </label>
+
 
       <label>
         รูปภาพ Base
       </label>
 
+
       <div class="image-box">
 
         <div class="muted">
-          กดเลือกภาพจากมือถือ/คอมได้เลย
-          ไม่ต้องใส่ URL เอง
+          เลือกรูปจากมือถือหรือคอมพิวเตอร์ได้เลย
         </div>
 
         <input
@@ -788,7 +1135,7 @@ function showBaseForm(b=null){
 
         <div
           id="fileName"
-          class="file-name">
+          class="muted">
         </div>
 
         <img
@@ -796,68 +1143,65 @@ function showBaseForm(b=null){
           class="preview"
           alt="ตัวอย่างรูป">
 
-        ${
-          b?.image_url
-          ? `
-            <div
-              class="muted"
-              style="margin-top:8px">
-              มีรูปเดิมอยู่แล้ว —
-              ถ้าไม่เลือกไฟล์ใหม่จะใช้รูปเดิม
-            </div>
-          `
-          : ''
-        }
-
-        <div
-          id="uploadProgress"
-          class="progress">
-          <i></i>
-        </div>
-
       </div>
 
-      <div
-        style="font-weight:700;margin-top:15px">
+
+      <div style="margin-top:15px;font-weight:700">
         🏷️ แท็ก
       </div>
 
-      <div class="check-grid">
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:repeat(2,minmax(0,1fr));
+          gap:8px;
+          margin-top:8px">
 
         ${
-          tags.map(t => `
+          tags.map(t=>`
+
             <label class="check">
 
               <input
                 type="checkbox"
                 value="${t.id}"
-                ${b?.tag_ids?.includes(t.id)
+                ${base?.tag_ids?.includes(t.id)
                   ? 'checked'
                   : ''}>
 
               ${esc(t.name)}
 
             </label>
-          `).join('') ||
 
+          `).join('')
+          ||
           '<div class="muted">ยังไม่มีแท็ก</div>'
         }
 
       </div>
 
+
       <div
-        style="display:flex;gap:8px;margin-top:16px">
+        style="
+          display:flex;
+          gap:8px;
+          margin-top:18px">
 
         <button
           class="primary"
-          onclick="saveBase('${b?.id || ''}')">
+          onclick="saveBase(${base?.id || 'null'})">
+
           💾 บันทึก
+
         </button>
 
         <button
           class="secondary"
           onclick="closeModal()">
+
           ยกเลิก
+
         </button>
 
       </div>
@@ -868,7 +1212,7 @@ function showBaseForm(b=null){
 
   $('fImage').addEventListener(
     'change',
-    () => {
+    ()=>{
 
       const file =
         $('fImage').files[0];
@@ -891,25 +1235,29 @@ function showBaseForm(b=null){
 
       $('imagePreview').style.display =
         'block';
+
     }
   );
+
 }
 
 
 /* =========================
    IMAGE UPLOAD
-   ========================= */
+========================= */
 
 async function uploadImage(file){
 
   const safe =
-    file.name.replace(
-      /[^a-zA-Z0-9._-]/g,
-      '_'
-    );
+    file.name
+      .replace(
+        /[^a-zA-Z0-9._-]/g,
+        '_'
+      );
 
   const path =
     `${crypto.randomUUID()}-${safe}`;
+
 
   const {error} =
     await sb.storage
@@ -917,234 +1265,307 @@ async function uploadImage(file){
       .upload(
         path,
         file,
-        {upsert:false}
+        {
+          upsert:false,
+          contentType:file.type
+        }
       );
 
-  if(error)throw error;
 
-  return sb.storage
-    .from(IMAGE_BUCKET)
-    .getPublicUrl(path)
-    .data.publicUrl;
+  if(error){
+    throw error;
+  }
+
+
+  return path;
+
 }
 
 
 /* =========================
    SAVE BASE
-   ========================= */
+========================= */
 
 async function saveBase(id){
 
-  const b =
+  const oldBase =
     id
-      ? bases.find(x => x.id === id)
+      ? bases.find(x => x.id == id)
       : null;
 
-  let image_url =
-    b?.image_url || null;
+
+  const name =
+    $('fName').value.trim();
+
+  if(!name){
+
+    alert(
+      'กรุณาใส่ชื่อ Base'
+    );
+
+    return;
+  }
+
+
+  const ownerValue =
+    $('fOwner').value;
+
+
+  const payload = {
+
+    name:name,
+
+    owner_id:
+      ownerValue
+        ? Number(ownerValue)
+        : null,
+
+    price:
+      Number($('fPrice').value) || 0,
+
+    commercial_x2:
+      $('fCommercial').checked,
+
+    max_orders:
+      Number($('fMaxOrders').value) || 0,
+
+    type:
+      $('fType').value,
+
+    notes:
+      $('fNotes').value.trim(),
+
+    status:
+      $('fStatus').value
+
+  };
+
+
+  let imagePath =
+    oldBase?.image_path || null;
+
 
   const file =
     $('fImage').files[0];
+
 
   try{
 
     if(file){
 
-      $('uploadProgress')
-        .style.display = 'block';
-
-      image_url =
+      imagePath =
         await uploadImage(file);
+
+      payload.image_path =
+        imagePath;
+
     }
 
-  }catch(e){
 
-    $('uploadProgress')
-      .style.display = 'none';
-
-    return alert(
-      'อัปโหลดรูปไม่สำเร็จ: ' +
-      e.message
-    );
-  }
+    let baseId;
 
 
-  const payload = {
+    if(id){
 
-    name:
-      $('fName').value.trim(),
-
-    credit:
-      $('fCredit').value.trim(),
-
-    price:
-      Number($('fPrice').value) || 0,
-
-    category:
-      $('fCat').value,
-
-    status:
-      $('fStatus').value,
-
-    details:
-      $('fDetails')
-        .value
-        .split(/\n/)
-        .map(x => x.trim())
-        .filter(Boolean),
-
-    image_url
-
-  };
+      const {error} =
+        await sb
+          .from('bases')
+          .update(payload)
+          .eq('id',id);
 
 
-  if(!payload.name){
+      if(error){
 
-    return alert(
-      'กรุณาใส่ชื่อ Base'
-    );
-  }
+        throw new Error(
+          'บันทึก Base ไม่สำเร็จ: ' +
+          error.message
+        );
+
+      }
+
+      baseId = id;
+
+    }else{
+
+      const {
+        data,
+        error
+      } =
+        await sb
+          .from('bases')
+          .insert(payload)
+          .select()
+          .single();
 
 
-  let baseId = id;
+      if(error){
 
+        throw new Error(
+          'เพิ่ม Base ไม่สำเร็จ: ' +
+          error.message
+        );
 
-  if(id){
+      }
 
-    const {error} =
-      await sb
-        .from('bases')
-        .update(payload)
-        .eq('id',id);
+      baseId =
+        data.id;
 
-    if(error){
-
-      return alert(
-        'บันทึกไม่สำเร็จ: ' +
-        error.message
-      );
     }
 
-  }else{
 
-    /*
-      ไม่มี sort_order
-      และไม่มี created_at
-      เพราะฐานข้อมูลจริงไม่มีคอลัมน์เหล่านี้
-    */
+    /* TAGS */
 
-    const {
-      data,
-      error
-    } =
-      await sb
-        .from('bases')
-        .insert(payload)
-        .select()
-        .single();
-
-    if(error){
-
-      return alert(
-        'เพิ่ม Base ไม่สำเร็จ: ' +
-        error.message
-      );
-    }
-
-    baseId =
-      data.id;
-  }
-
-
-  await sb
-    .from('base_tags')
-    .delete()
-    .eq('base_id',baseId);
-
-
-  const chosen =
-    [
-      ...document.querySelectorAll(
-        '#modalBody input[type=checkbox]:checked'
-      )
-    ].map(x => ({
-      base_id:baseId,
-      tag_id:x.value
-    }));
-
-
-  if(chosen.length){
-
-    const {error} =
+    const {error:deleteTagError} =
       await sb
         .from('base_tags')
-        .insert(chosen);
+        .delete()
+        .eq('base_id',baseId);
 
-    if(error){
 
-      return alert(
-        'บันทึกแท็กไม่สำเร็จ: ' +
-        error.message
+    if(deleteTagError){
+
+      throw new Error(
+        'จัดการแท็กไม่สำเร็จ: ' +
+        deleteTagError.message
       );
+
     }
+
+
+    const chosen =
+      [
+        ...document.querySelectorAll(
+          '#modalBody input[type=checkbox]:checked'
+        )
+      ].map(x=>({
+
+        base_id:baseId,
+
+        tag_id:Number(x.value)
+
+      }));
+
+
+    if(chosen.length){
+
+      const {error} =
+        await sb
+          .from('base_tags')
+          .insert(chosen);
+
+
+      if(error){
+
+        throw new Error(
+          'บันทึกแท็กไม่สำเร็จ: ' +
+          error.message
+        );
+
+      }
+
+    }
+
+
+    closeModal();
+
+    await load();
+
+
+    alert(
+      id
+        ? 'บันทึก Base เรียบร้อยแล้ว ♡'
+        : 'เพิ่ม Base เรียบร้อยแล้ว ♡'
+    );
+
+
+  }catch(error){
+
+    alert(
+      error.message
+    );
+
   }
 
-
-  closeModal();
-  load();
 }
 
 
 /* =========================
-   ACTIONS
-   ========================= */
+   EDIT
+========================= */
 
 function editBase(id){
 
-  showBaseForm(
-    bases.find(x => x.id === id)
-  );
+  const base =
+    bases.find(x => x.id == id);
+
+  if(base){
+    showBaseForm(base);
+  }
 
 }
 
 
+/* =========================
+   STATUS
+========================= */
+
 async function toggleStatus(id){
 
-  const b =
-    bases.find(x => x.id === id);
+  const base =
+    bases.find(x => x.id == id);
+
+  if(!base){
+    return;
+  }
+
+
+  const next =
+    base.status === 'closed'
+      ? 'open'
+      : 'closed';
+
 
   const {error} =
     await sb
       .from('bases')
       .update({
-        status:
-          b.status === 'open'
-            ? 'closed'
-            : 'open'
+        status:next
       })
       .eq('id',id);
 
+
   if(error){
 
-    alert(error.message);
+    alert(
+      'เปลี่ยนสถานะไม่สำเร็จ: ' +
+      error.message
+    );
 
-  }else{
-
-    load();
-
+    return;
   }
+
+
+  await load();
+
 }
 
+
+/* =========================
+   DELETE
+========================= */
 
 async function deleteBase(id){
 
   if(
     !confirm(
-      'ลบ Base นี้ถาวรหรือไม่?'
+      'ต้องการลบ Base นี้ถาวรหรือไม่?'
     )
   ){
+
     return;
+
   }
+
 
   const {error} =
     await sb
@@ -1152,21 +1573,26 @@ async function deleteBase(id){
       .delete()
       .eq('id',id);
 
+
   if(error){
 
-    alert(error.message);
+    alert(
+      'ลบ Base ไม่สำเร็จ: ' +
+      error.message
+    );
 
-  }else{
-
-    load();
-
+    return;
   }
+
+
+  await load();
+
 }
 
 
 /* =========================
-   START
-   ========================= */
+   RUN
+========================= */
 
 start();
 
