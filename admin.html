@@ -219,7 +219,6 @@ button.danger{
   gap:10px
 }
 
-/* ช่อง checkbox ทั่วไป */
 .check{
   display:flex;
   align-items:center;
@@ -240,7 +239,6 @@ button.danger{
   accent-color:#df729f
 }
 
-/* Commercial ×2 */
 .commercial-check{
   display:flex;
   align-items:center;
@@ -263,11 +261,11 @@ button.danger{
   padding:0;
   cursor:pointer;
   flex:0 0 auto;
-  accent-color:#df729f;
+  accent-color:#df729f
 }
 
 .commercial-check span{
-  cursor:pointer;
+  cursor:pointer
 }
 
 .image-box{
@@ -449,9 +447,7 @@ button.danger{
 
 </div>
 
-<div
-  id="modal"
-  class="modal">
+<div id="modal" class="modal">
 
   <div class="modal-card">
 
@@ -481,6 +477,12 @@ const SUPABASE_KEY =
 
 const IMAGE_BUCKET =
   "base-images";
+
+/*
+  Commercial x2 เป็น Tag จริงในฐานข้อมูล
+  และมี tags.id = 40
+*/
+const COMMERCIAL_TAG_ID = 40;
 
 let sb = null;
 let bases = [];
@@ -763,7 +765,7 @@ async function loadAll(){
       if(row.tag_id != null){
 
         tagMap[row.base_id]
-          .push(row.tag_id);
+          .push(Number(row.tag_id));
 
       }
 
@@ -812,13 +814,13 @@ function renderTags(){
 
           <button
             class="secondary small"
-            onclick="renameTag(${tag.id})">
+            onclick="renameTag(${Number(tag.id)})">
             แก้ชื่อ
           </button>
 
           <button
             class="danger small"
-            onclick="deleteTag(${tag.id})">
+            onclick="deleteTag(${Number(tag.id)})">
             ลบ
           </button>
 
@@ -922,7 +924,7 @@ async function renameTag(id){
 
   const tag =
     tags.find(
-      x => String(x.id) === String(id)
+      x => Number(x.id) === Number(id)
     );
 
   if(!tag){
@@ -947,12 +949,12 @@ async function renameTag(id){
   const {
     error
   } =
-    await sb
-      .from('tags')
-      .update({
-        name:newName.trim()
-      })
-      .eq('id',id);
+  await sb
+    .from('tags')
+    .update({
+      name:newName.trim()
+    })
+    .eq('id',id);
 
   if(error){
 
@@ -989,10 +991,10 @@ async function deleteTag(id){
   const {
     error
   } =
-    await sb
-      .from('tags')
-      .delete()
-      .eq('id',id);
+  await sb
+    .from('tags')
+    .delete()
+    .eq('id',id);
 
   if(error){
 
@@ -1104,8 +1106,8 @@ function renderBases(){
                       const tag =
                         tags.find(
                           x =>
-                          String(x.id) ===
-                          String(tagId)
+                          Number(x.id) ===
+                          Number(tagId)
                         );
 
                       return tag
@@ -1126,7 +1128,7 @@ function renderBases(){
 
             <button
               class="secondary small"
-              onclick="editBase(${base.id})">
+              onclick="editBase(${Number(base.id)})">
 
               ✏️ แก้ไข
 
@@ -1134,7 +1136,7 @@ function renderBases(){
 
             <button
               class="secondary small"
-              onclick="toggleStatus(${base.id})">
+              onclick="toggleStatus(${Number(base.id)})">
 
               ${
                 open
@@ -1146,7 +1148,7 @@ function renderBases(){
 
             <button
               class="danger small"
-              onclick="deleteBase(${base.id})">
+              onclick="deleteBase(${Number(base.id)})">
 
               ลบ
 
@@ -1231,6 +1233,20 @@ function showBaseForm(base){
   const status =
     base?.status || 'open';
 
+  const existingTagIds =
+    (base?.tag_ids || [])
+      .map(Number);
+
+  /*
+    Commercial x2 ในฐานข้อมูลคือ Tag ID 40
+    ช่องทางการค้า ×2 จะ checked เมื่อ Base
+    มี tag 40 อยู่
+  */
+  const commercialChecked =
+    existingTagIds.includes(
+      COMMERCIAL_TAG_ID
+    );
+
   openModal(
 
     base
@@ -1268,7 +1284,7 @@ function showBaseForm(base){
                 .map(owner=>`
 
                   <option
-                    value="${owner.id}"
+                    value="${Number(owner.id)}"
                     ${
                       String(base?.owner_id)
                       ===
@@ -1408,7 +1424,11 @@ function showBaseForm(base){
       </label>
 
 
-      <!-- COMMERCIAL ×2 -->
+      <!--
+        Commercial x2 = Tag ID 40
+        ตัวนี้จะบันทึกลง base_tags โดยตรง
+      -->
+
       <label
         class="commercial-check"
         for="fCommercial">
@@ -1416,8 +1436,9 @@ function showBaseForm(base){
         <input
           id="fCommercial"
           type="checkbox"
+          data-tag-id="40"
           ${
-            base?.commercial_x2 === true
+            commercialChecked
             ? 'checked'
             : ''
           }>
@@ -1519,27 +1540,36 @@ function showBaseForm(base){
 
         ${
           tags
-            .map(tag=>`
+            .map(tag=>{
 
-              <label class="check">
+              const tagId =
+                Number(tag.id);
 
-                <input
-                  type="checkbox"
-                  class="base-tag-checkbox"
-                  data-tag-id="${tag.id}"
-                  ${
-                    base?.tag_ids
-                    ?.map(String)
-                    ?.includes(String(tag.id))
-                    ? 'checked'
-                    : ''
-                  }>
+              if(!Number.isFinite(tagId)){
+                return '';
+              }
 
-                ${esc(tag.name)}
+              return `
 
-              </label>
+                <label class="check">
 
-            `)
+                  <input
+                    type="checkbox"
+                    class="base-tag-checkbox"
+                    data-tag-id="${tagId}"
+                    ${
+                      existingTagIds.includes(tagId)
+                      ? 'checked'
+                      : ''
+                    }>
+
+                  ${esc(tag.name)}
+
+                </label>
+
+              `;
+
+            })
             .join('')
 
           ||
@@ -1579,6 +1609,48 @@ function showBaseForm(base){
 
     `
   );
+
+
+  /*
+    ทำให้ checkbox ทางการค้า ×2
+    และ checkbox Tag "Commercial x2"
+    ด้านล่างทำงานเชื่อมกัน
+  */
+
+  const commercialCheckbox =
+    $('fCommercial');
+
+  const commercialTagCheckbox =
+    document.querySelector(
+      '#modalBody .base-tag-checkbox[data-tag-id="40"]'
+    );
+
+  if(
+    commercialCheckbox &&
+    commercialTagCheckbox
+  ){
+
+    commercialCheckbox.addEventListener(
+      'change',
+      ()=>{
+
+        commercialTagCheckbox.checked =
+          commercialCheckbox.checked;
+
+      }
+    );
+
+    commercialTagCheckbox.addEventListener(
+      'change',
+      ()=>{
+
+        commercialCheckbox.checked =
+          commercialTagCheckbox.checked;
+
+      }
+    );
+
+  }
 
 
   const imageInput =
@@ -1703,6 +1775,7 @@ async function saveBase(id){
   const commercialCheckbox =
     $('fCommercial');
 
+
   const payload = {
 
     name:name,
@@ -1717,6 +1790,10 @@ async function saveBase(id){
         $('fPrice').value
       ) || 0,
 
+    /*
+      ค่าใน bases ยังเก็บไว้ด้วย
+      เพื่อไม่ให้ข้อมูลเดิมเสีย
+    */
     commercial_x2:
       commercialCheckbox
       ? commercialCheckbox.checked
@@ -1740,12 +1817,16 @@ async function saveBase(id){
 
   };
 
+
   const file =
     $('fImage').files[0];
 
+
   try{
 
-    /* IMAGE */
+    /* =====================
+       IMAGE
+    ===================== */
 
     if(file){
 
@@ -1761,7 +1842,9 @@ async function saveBase(id){
     let baseId;
 
 
-    /* UPDATE */
+    /* =====================
+       UPDATE
+    ===================== */
 
     if(id){
 
@@ -1782,12 +1865,15 @@ async function saveBase(id){
 
       }
 
-      baseId = id;
+      baseId =
+        Number(id);
 
     }
 
 
-    /* INSERT */
+    /* =====================
+       INSERT
+    ===================== */
 
     else{
 
@@ -1811,12 +1897,25 @@ async function saveBase(id){
       }
 
       baseId =
-        data.id;
+        Number(data.id);
 
     }
 
 
-    /* TAGS */
+    if(
+      !Number.isFinite(baseId)
+    ){
+
+      throw new Error(
+        'ไม่พบ ID ของ Base ที่บันทึก'
+      );
+
+    }
+
+
+    /* =====================
+       DELETE OLD TAG LINKS
+    ===================== */
 
     const {
       error:deleteError
@@ -1839,35 +1938,158 @@ async function saveBase(id){
     }
 
 
-    const selectedTagIds =
+    /* =====================
+       COLLECT TAGS
+    ===================== */
+
+    const checkedTagCheckboxes =
       [
         ...document.querySelectorAll(
-          '#modalBody .base-tag-checkbox:checked'
+          '#modalBody input.base-tag-checkbox:checked'
         )
-      ]
-      .map(
-        checkbox =>
-          Number(
-            checkbox.dataset.tagId
+      ];
+
+
+    /*
+      อ่าน tag_id จาก data-tag-id
+      และตรวจสอบกับ tags จริงอีกครั้ง
+    */
+
+    const selectedTagIds = [
+      ...new Set(
+        checkedTagCheckboxes
+          .map(
+            checkbox =>
+              Number(
+                checkbox.dataset.tagId
+              )
+          )
+          .filter(
+            tagId =>
+              Number.isInteger(tagId) &&
+              tagId > 0
+          )
+          .filter(
+            tagId =>
+              tags.some(
+                tag =>
+                  Number(tag.id) ===
+                  tagId
+              )
           )
       )
-      .filter(
-        tagId =>
-          Number.isFinite(tagId)
-      );
+    ];
 
 
-    if(selectedTagIds.length){
+    /*
+      Commercial ×2 ด้านบน
+      ต้องสัมพันธ์กับ Tag ID 40 เสมอ
+    */
+
+    if(
+      commercialCheckbox &&
+      commercialCheckbox.checked
+    ){
+
+      if(
+        tags.some(
+          tag =>
+            Number(tag.id) ===
+            COMMERCIAL_TAG_ID
+        )
+      ){
+
+        if(
+          !selectedTagIds.includes(
+            COMMERCIAL_TAG_ID
+          )
+        ){
+
+          selectedTagIds.push(
+            COMMERCIAL_TAG_ID
+          );
+
+        }
+
+      }
+
+    }
+    else{
+
+      /*
+        ถ้าปิด Commercial ×2
+        ให้เอา Tag 40 ออก
+      */
+
+      const index =
+        selectedTagIds.indexOf(
+          COMMERCIAL_TAG_ID
+        );
+
+      if(index !== -1){
+
+        selectedTagIds.splice(
+          index,
+          1
+        );
+
+      }
+
+    }
+
+
+    /* =====================
+       INSERT TAG LINKS
+    ===================== */
+
+    if(
+      selectedTagIds.length > 0
+    ){
 
       const rows =
-        selectedTagIds.map(
-          tagId => ({
+        selectedTagIds
+          .filter(
+            tagId =>
+              Number.isInteger(tagId) &&
+              tagId > 0
+          )
+          .map(
+            tagId => ({
 
-            base_id:baseId,
-            tag_id:tagId
+              base_id:baseId,
 
-          })
+              tag_id:tagId
+
+            })
+          );
+
+
+      /*
+        ตรวจสอบอีกครั้งก่อนส่ง
+        เพื่อไม่ให้ null / undefined
+        เข้า base_tags
+      */
+
+      const invalidRow =
+        rows.find(
+          row =>
+            !Number.isInteger(
+              row.base_id
+            ) ||
+            !Number.isInteger(
+              row.tag_id
+            )
         );
+
+
+      if(invalidRow){
+
+        throw new Error(
+          'พบข้อมูลแท็กไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง'
+        );
+
+      }
+
 
       const {
         error:tagError
@@ -1875,6 +2097,7 @@ async function saveBase(id){
       await sb
         .from('base_tags')
         .insert(rows);
+
 
       if(tagError){
 
