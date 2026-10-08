@@ -1,20 +1,2215 @@
-begin;
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NIMURI — Admin</title>
 
-with candidate as (
-  select b.id
-  from public.bases b
-  where not exists (
-    select 1
-    from public.base_tags bt
-    where bt.base_id = b.id
-      and bt.tag_id = 40
-  )
-  order by b.id
-  limit 1
-)
-insert into public.base_tags (base_id, tag_id)
-select id, 40
-from candidate
-returning *;
+<style>
+*{box-sizing:border-box}
 
-rollback;
+:root{
+  --bg:#fff7fb;
+  --white:#fff;
+  --pink:#ef9fbe;
+  --pink2:#df729f;
+  --line:#efd8e2;
+  --text:#40343a;
+  --muted:#9b858e;
+  --dark:#44373e
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-size:14px
+}
+
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+
+header{
+  text-align:center;
+  padding:30px 16px 22px
+}
+
+header h1{
+  margin:0;
+  font-size:27px
+}
+
+header p{
+  margin:7px 0 0;
+  color:var(--muted)
+}
+
+.wrap{
+  width:min(100%,980px);
+  margin:auto;
+  padding:0 14px 50px
+}
+
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:17px;
+  margin-bottom:16px;
+  box-shadow:0 6px 22px rgba(150,100,125,.06)
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center
+}
+
+.between{
+  justify-content:space-between
+}
+
+h2{
+  margin:0 0 8px;
+  font-size:18px
+}
+
+.muted{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5
+}
+
+label{
+  display:block;
+  font-weight:700;
+  font-size:13px;
+  margin:12px 0 0
+}
+
+input,select,textarea{
+  width:100%;
+  margin-top:6px;
+  border:1px solid #ead1dc;
+  border-radius:12px;
+  background:#fff;
+  padding:11px 12px;
+  color:var(--text);
+  outline:none
+}
+
+textarea{
+  resize:vertical
+}
+
+button.primary,
+button.secondary,
+button.danger{
+  border-radius:11px;
+  padding:10px 14px
+}
+
+.primary{
+  background:var(--dark);
+  color:#fff;
+  border:0
+}
+
+.secondary{
+  background:#fff;
+  border:1px solid #e6ccd8;
+  color:#725d67
+}
+
+.danger{
+  background:#fff0f2;
+  color:#c65d70;
+  border:1px solid #f0cbd2
+}
+
+.small{
+  padding:8px 11px !important;
+  font-size:12px
+}
+
+.msg{
+  color:#b35f84;
+  min-height:18px
+}
+
+.list{
+  display:grid;
+  gap:10px
+}
+
+.item{
+  border:1px solid #f0dfe6;
+  border-radius:15px;
+  padding:13px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center
+}
+
+.actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  justify-content:flex-end
+}
+
+.chips{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:7px
+}
+
+.chips span{
+  background:#fff0f6;
+  color:#bd6289;
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:11px
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(60,40,50,.28);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:10px;
+  z-index:20
+}
+
+.modal.show{
+  display:flex
+}
+
+.modal-card{
+  width:min(100%,680px);
+  max-height:92vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:22px;
+  padding:18px;
+  position:relative
+}
+
+.close{
+  position:absolute;
+  right:12px;
+  top:10px;
+  border:0;
+  background:#f8edf2;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  font-size:22px;
+  color:#7d6570
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+
+.check{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  background:#fff8fb;
+  border:1px solid #efdde5;
+  border-radius:10px;
+  padding:9px;
+  font-weight:500;
+  cursor:pointer;
+  user-select:none
+}
+
+.check input{
+  width:auto;
+  margin:0;
+  cursor:pointer;
+  accent-color:#df729f
+}
+
+.commercial-check{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  background:#fff8fb;
+  border:1px solid #efdde5;
+  border-radius:12px;
+  padding:11px 12px;
+  margin-top:14px;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+  width:100%
+}
+
+.commercial-check input{
+  width:20px;
+  height:20px;
+  margin:0;
+  padding:0;
+  cursor:pointer;
+  flex:0 0 auto;
+  accent-color:#df729f
+}
+
+.commercial-check span{
+  cursor:pointer
+}
+
+.image-box{
+  border:1px dashed #e6bfd0;
+  border-radius:15px;
+  padding:12px;
+  margin-top:7px;
+  background:#fffafd
+}
+
+.preview{
+  width:100%;
+  max-height:260px;
+  object-fit:contain;
+  border-radius:12px;
+  background:#f8edf2;
+  margin-top:9px;
+  display:none
+}
+
+.status-open{
+  color:#27885c;
+  font-weight:700
+}
+
+.status-closed{
+  color:#c65d70;
+  font-weight:700
+}
+
+.base-image{
+  width:75px;
+  height:75px;
+  object-fit:cover;
+  border-radius:13px;
+  background:#f8edf2;
+  border:1px solid #efdde5
+}
+
+.base-left{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  min-width:0
+}
+
+@media(max-width:600px){
+  header h1{font-size:24px}
+
+  .row,
+  .item{
+    align-items:flex-start;
+    flex-direction:column
+  }
+
+  .actions{
+    width:100%;
+    justify-content:flex-start
+  }
+
+  .actions button{
+    flex:1
+  }
+
+  .grid2{
+    grid-template-columns:1fr
+  }
+
+  .base-left{
+    width:100%
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>NIMURI — Owner ♡</h1>
+  <p>จัดการ Bases</p>
+</header>
+
+<div class="wrap">
+
+  <div id="loginBox" class="panel">
+
+    <h2>🔐 เข้าสู่ระบบ</h2>
+
+    <label>
+      อีเมล
+      <input
+        id="email"
+        type="email"
+        autocomplete="email">
+    </label>
+
+    <label>
+      รหัสผ่าน
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password">
+    </label>
+
+    <button
+      class="primary"
+      id="loginBtn"
+      style="margin-top:14px">
+      เข้าสู่ระบบ
+    </button>
+
+    <p id="loginMsg" class="msg"></p>
+
+  </div>
+
+  <div id="app" style="display:none">
+
+    <div class="panel row between">
+
+      <div>
+        <b id="who"></b>
+
+        <div class="muted">
+          จัดการข้อมูล Base ของ NIMURI
+        </div>
+      </div>
+
+      <button
+        id="logoutBtn"
+        class="secondary">
+        ออกจากระบบ
+      </button>
+
+    </div>
+
+    <div class="panel">
+
+      <div class="row between">
+
+        <h2>🏷️ แท็ก</h2>
+
+        <button
+          class="primary small"
+          id="newTagBtn">
+          + เพิ่มแท็ก
+        </button>
+
+      </div>
+
+      <div
+        id="tagList"
+        class="list">
+      </div>
+
+    </div>
+
+    <div class="panel">
+
+      <div class="row between">
+
+        <h2>🎨 Bases</h2>
+
+        <button
+          class="primary small"
+          id="newBaseBtn">
+          + เพิ่ม Base
+        </button>
+
+      </div>
+
+      <div
+        id="baseList"
+        class="list">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="modal" class="modal">
+
+  <div class="modal-card">
+
+    <button
+      class="close"
+      id="closeModal">
+      ×
+    </button>
+
+    <h2 id="modalTitle"></h2>
+
+    <div id="modalBody"></div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+  "https://ncczyxjtcnchnzvrbtvy.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm";
+
+const IMAGE_BUCKET =
+  "base-images";
+
+/*
+  Commercial x2 เป็น Tag จริงในฐานข้อมูล
+  และมี tags.id = 40
+*/
+const COMMERCIAL_TAG_ID = 40;
+
+let sb = null;
+let bases = [];
+let tags = [];
+let owners = [];
+
+const $ = id =>
+  document.getElementById(id);
+
+/* =========================
+   HELPERS
+========================= */
+
+function esc(value){
+
+  return String(value ?? '')
+    .replace(
+      /[&<>"']/g,
+      char => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#039;'
+      }[char])
+    );
+
+}
+
+function typeLabel(type){
+
+  const map = {
+
+    "chibi-single":"จิบิเดี่ยว",
+    "chibi-pair":"จิบิคู่",
+    "normal-single":"สเกลปกติ เดี่ยว",
+    "normal-pair":"สเกลปกติ คู่"
+
+  };
+
+  return map[type] || type || '-';
+
+}
+
+function ownerName(id){
+
+  const owner =
+    owners.find(
+      x => String(x.id) === String(id)
+    );
+
+  return owner?.name || 'ไม่ระบุเจ้าของ';
+
+}
+
+function publicImageUrl(path){
+
+  if(!path){
+    return '';
+  }
+
+  const result =
+    sb.storage
+      .from(IMAGE_BUCKET)
+      .getPublicUrl(path);
+
+  return result.data?.publicUrl || '';
+
+}
+
+/* =========================
+   START
+========================= */
+
+async function start(){
+
+  sb =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+  const {
+    data:{session}
+  } =
+    await sb.auth.getSession();
+
+  if(session){
+
+    await showApp(session);
+
+  }else{
+
+    showLogin();
+
+  }
+
+  sb.auth.onAuthStateChange(
+    async (_event,session)=>{
+
+      if(session){
+
+        await showApp(session);
+
+      }else{
+
+        showLogin();
+
+      }
+
+    }
+  );
+
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+$('loginBtn').onclick =
+  async()=>{
+
+    $('loginMsg').textContent = '';
+
+    const email =
+      $('email').value.trim();
+
+    const password =
+      $('password').value;
+
+    const {
+      error
+    } =
+      await sb.auth.signInWithPassword({
+
+        email,
+        password
+
+      });
+
+    if(error){
+
+      $('loginMsg').textContent =
+        error.message;
+
+    }
+
+  };
+
+$('logoutBtn').onclick =
+  async()=>{
+
+    await sb.auth.signOut();
+
+  };
+
+function showLogin(){
+
+  $('loginBox').style.display =
+    'block';
+
+  $('app').style.display =
+    'none';
+
+}
+
+async function showApp(session){
+
+  $('loginBox').style.display =
+    'none';
+
+  $('app').style.display =
+    'block';
+
+  $('who').textContent =
+    session.user.email || 'เจ้าของ';
+
+  await loadAll();
+
+}
+
+/* =========================
+   LOAD ALL
+========================= */
+
+async function loadAll(){
+
+  const [
+    basesResult,
+    tagsResult,
+    baseTagsResult,
+    ownersResult
+  ] =
+  await Promise.all([
+
+    sb
+      .from('bases')
+      .select('*')
+      .order('id'),
+
+    sb
+      .from('tags')
+      .select('*')
+      .order('id'),
+
+    sb
+      .from('base_tags')
+      .select('*'),
+
+    sb
+      .from('owners')
+      .select('*')
+      .order('id')
+
+  ]);
+
+  if(basesResult.error){
+
+    alert(
+      'โหลด Base ไม่สำเร็จ: ' +
+      basesResult.error.message
+    );
+
+    return;
+
+  }
+
+  if(tagsResult.error){
+
+    alert(
+      'โหลดแท็กไม่สำเร็จ: ' +
+      tagsResult.error.message
+    );
+
+    return;
+
+  }
+
+  if(baseTagsResult.error){
+
+    alert(
+      'โหลดความสัมพันธ์แท็กไม่สำเร็จ: ' +
+      baseTagsResult.error.message
+    );
+
+    return;
+
+  }
+
+  if(ownersResult.error){
+
+    alert(
+      'โหลดเจ้าของไม่สำเร็จ: ' +
+      ownersResult.error.message
+    );
+
+    return;
+
+  }
+
+  const tagMap = {};
+
+  (baseTagsResult.data || [])
+    .forEach(row=>{
+
+      if(!tagMap[row.base_id]){
+        tagMap[row.base_id] = [];
+      }
+
+      if(row.tag_id != null){
+
+        tagMap[row.base_id]
+          .push(Number(row.tag_id));
+
+      }
+
+    });
+
+  bases =
+    (basesResult.data || [])
+      .map(base=>({
+
+        ...base,
+
+        tag_ids:
+          tagMap[base.id] || []
+
+      }));
+
+  tags =
+    tagsResult.data || [];
+
+  owners =
+    ownersResult.data || [];
+
+  renderTags();
+  renderBases();
+
+}
+
+/* =========================
+   RENDER TAGS
+========================= */
+
+function renderTags(){
+
+  $('tagList').innerHTML =
+
+    tags.map(tag=>`
+
+      <div class="item">
+
+        <b>
+          ${esc(tag.name)}
+        </b>
+
+        <div class="actions">
+
+          <button
+            class="secondary small"
+            onclick="renameTag(${Number(tag.id)})">
+            แก้ชื่อ
+          </button>
+
+          <button
+            class="danger small"
+            onclick="deleteTag(${Number(tag.id)})">
+            ลบ
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join('')
+
+    ||
+
+    '<div class="muted">ยังไม่มีแท็ก</div>';
+
+}
+
+/* =========================
+   CREATE TAG
+========================= */
+
+$('newTagBtn').onclick =
+  ()=>{
+
+    openModal(
+
+      '🏷️ เพิ่มแท็ก',
+
+      `
+
+        <label>
+          ชื่อแท็ก
+
+          <input
+            id="tagName"
+            placeholder="เช่น Cute">
+        </label>
+
+        <button
+          class="primary"
+          style="margin-top:15px"
+          onclick="createTag()">
+
+          เพิ่มแท็ก
+
+        </button>
+
+      `
+
+    );
+
+  };
+
+async function createTag(){
+
+  const name =
+    $('tagName')
+      .value
+      .trim();
+
+  if(!name){
+
+    alert('กรุณาใส่ชื่อแท็ก');
+
+    return;
+
+  }
+
+  const {
+    error
+  } =
+    await sb
+      .from('tags')
+      .insert({
+        name
+      });
+
+  if(error){
+
+    alert(
+      'เพิ่มแท็กไม่สำเร็จ: ' +
+      error.message
+    );
+
+    return;
+
+  }
+
+  closeModal();
+
+  await loadAll();
+
+}
+
+/* =========================
+   RENAME TAG
+========================= */
+
+async function renameTag(id){
+
+  const tag =
+    tags.find(
+      x => Number(x.id) === Number(id)
+    );
+
+  if(!tag){
+    return;
+  }
+
+  const newName =
+    prompt(
+      'ชื่อแท็กใหม่',
+      tag.name
+    );
+
+  if(
+    !newName ||
+    newName.trim() === tag.name
+  ){
+
+    return;
+
+  }
+
+  const {
+    error
+  } =
+  await sb
+    .from('tags')
+    .update({
+      name:newName.trim()
+    })
+    .eq('id',id);
+
+  if(error){
+
+    alert(
+      'แก้ชื่อแท็กไม่สำเร็จ: ' +
+      error.message
+    );
+
+    return;
+
+  }
+
+  await loadAll();
+
+}
+
+/* =========================
+   DELETE TAG
+========================= */
+
+async function deleteTag(id){
+
+  if(
+    !confirm(
+      'ต้องการลบแท็กนี้หรือไม่?'
+    )
+  ){
+
+    return;
+
+  }
+
+  const {
+    error
+  } =
+  await sb
+    .from('tags')
+    .delete()
+    .eq('id',id);
+
+  if(error){
+
+    alert(
+      'ลบแท็กไม่สำเร็จ: ' +
+      error.message
+    );
+
+    return;
+
+  }
+
+  await loadAll();
+
+}
+
+/* =========================
+   RENDER BASES
+========================= */
+
+function renderBases(){
+
+  $('baseList').innerHTML =
+
+    bases.map(base=>{
+
+      const open =
+        base.status !== 'closed';
+
+      const image =
+        publicImageUrl(
+          base.image_path
+        );
+
+      return `
+
+        <div class="item">
+
+          <div class="base-left">
+
+            ${
+              image
+              ? `
+                <img
+                  class="base-image"
+                  src="${image}"
+                  alt="">
+              `
+              : `
+                <div
+                  class="base-image"
+                  style="
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:25px">
+                  ♡
+                </div>
+              `
+            }
+
+            <div>
+
+              <b>
+                ${esc(base.name)}
+              </b>
+
+              <div class="muted">
+
+                ${esc(
+                  typeLabel(base.type)
+                )}
+
+                ·
+
+                ${Number(base.price) || 0}
+                บาท
+
+                ·
+
+                ${esc(
+                  ownerName(base.owner_id)
+                )}
+
+              </div>
+
+              <div
+                class="${
+                  open
+                  ? 'status-open'
+                  : 'status-closed'
+                }">
+
+                ${
+                  open
+                  ? '🟢 เปิดรับ'
+                  : '🔴 ปิดรับ'
+                }
+
+              </div>
+
+              <div class="chips">
+
+                ${
+                  base.tag_ids
+                    .map(tagId=>{
+
+                      const tag =
+                        tags.find(
+                          x =>
+                          Number(x.id) ===
+                          Number(tagId)
+                        );
+
+                      return tag
+                        ? `<span>${esc(tag.name)}</span>`
+                        : '';
+
+                    })
+                    .join('')
+                }
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              class="secondary small"
+              onclick="editBase(${Number(base.id)})">
+
+              ✏️ แก้ไข
+
+            </button>
+
+            <button
+              class="secondary small"
+              onclick="toggleStatus(${Number(base.id)})">
+
+              ${
+                open
+                ? '🔴 ปิดรับ'
+                : '🟢 เปิดรับ'
+              }
+
+            </button>
+
+            <button
+              class="danger small"
+              onclick="deleteBase(${Number(base.id)})">
+
+              ลบ
+
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join('')
+
+    ||
+
+    '<div class="muted">ยังไม่มี Base</div>';
+
+}
+
+/* =========================
+   MODAL
+========================= */
+
+function openModal(title,html){
+
+  $('modalTitle').textContent =
+    title;
+
+  $('modalBody').innerHTML =
+    html;
+
+  $('modal').classList.add('show');
+
+}
+
+function closeModal(){
+
+  $('modal').classList.remove('show');
+
+}
+
+$('closeModal').onclick =
+  closeModal;
+
+$('modal').onclick =
+  event=>{
+
+    if(
+      event.target ===
+      $('modal')
+    ){
+
+      closeModal();
+
+    }
+
+  };
+
+/* =========================
+   NEW BASE
+========================= */
+
+$('newBaseBtn').onclick =
+  ()=>showBaseForm(null);
+
+/* =========================
+   BASE FORM
+========================= */
+
+function showBaseForm(base){
+
+  const type =
+    base?.type ||
+    'chibi-single';
+
+  const status =
+    base?.status || 'open';
+
+  const existingTagIds =
+    (base?.tag_ids || [])
+      .map(Number);
+
+  /*
+    Commercial x2 ในฐานข้อมูลคือ Tag ID 40
+    ช่องทางการค้า ×2 จะ checked เมื่อ Base
+    มี tag 40 อยู่
+  */
+  const commercialChecked =
+    existingTagIds.includes(
+      COMMERCIAL_TAG_ID
+    );
+
+  openModal(
+
+    base
+      ? '✏️ แก้ไข Base'
+      : '✨ เพิ่ม Base',
+
+    `
+
+      <label>
+
+        ชื่อ Base
+
+        <input
+          id="fName"
+          value="${esc(base?.name || '')}"
+          placeholder="ชื่อ Base">
+
+      </label>
+
+      <div class="grid2">
+
+        <label>
+
+          เจ้าของ
+
+          <select id="fOwner">
+
+            <option value="">
+              — เลือกเจ้าของ —
+            </option>
+
+            ${
+              owners
+                .map(owner=>`
+
+                  <option
+                    value="${Number(owner.id)}"
+                    ${
+                      String(base?.owner_id)
+                      ===
+                      String(owner.id)
+                      ? 'selected'
+                      : ''
+                    }>
+
+                    ${esc(owner.name)}
+
+                  </option>
+
+                `)
+                .join('')
+            }
+
+          </select>
+
+        </label>
+
+        <label>
+
+          ราคา (บาท)
+
+          <input
+            id="fPrice"
+            type="number"
+            min="0"
+            value="${
+              Number(base?.price) || 0
+            }">
+
+        </label>
+
+      </div>
+
+      <div class="grid2">
+
+        <label>
+
+          ประเภท
+
+          <select id="fType">
+
+            <option
+              value="chibi-single"
+              ${
+                type === 'chibi-single'
+                ? 'selected'
+                : ''
+              }>
+              จิบิเดี่ยว
+            </option>
+
+            <option
+              value="chibi-pair"
+              ${
+                type === 'chibi-pair'
+                ? 'selected'
+                : ''
+              }>
+              จิบิคู่
+            </option>
+
+            <option
+              value="normal-single"
+              ${
+                type === 'normal-single'
+                ? 'selected'
+                : ''
+              }>
+              สเกลปกติ เดี่ยว
+            </option>
+
+            <option
+              value="normal-pair"
+              ${
+                type === 'normal-pair'
+                ? 'selected'
+                : ''
+              }>
+              สเกลปกติ คู่
+            </option>
+
+          </select>
+
+        </label>
+
+        <label>
+
+          จำนวนงานสูงสุด
+
+          <input
+            id="fMaxOrders"
+            type="number"
+            min="0"
+            value="${
+              Number(base?.max_orders) || 0
+            }">
+
+        </label>
+
+      </div>
+
+      <label>
+
+        สถานะรับงาน
+
+        <select id="fStatus">
+
+          <option
+            value="open"
+            ${
+              status !== 'closed'
+              ? 'selected'
+              : ''
+            }>
+            🟢 เปิดรับ
+          </option>
+
+          <option
+            value="closed"
+            ${
+              status === 'closed'
+              ? 'selected'
+              : ''
+            }>
+            🔴 ปิดรับ
+          </option>
+
+        </select>
+
+      </label>
+
+      <!--
+        Commercial x2 = Tag ID 40
+        ตัวนี้จะบันทึกลง base_tags โดยตรง
+      -->
+
+      <label
+        class="commercial-check"
+        for="fCommercial">
+
+        <input
+          id="fCommercial"
+          type="checkbox"
+          data-tag-id="40"
+          ${
+            commercialChecked
+            ? 'checked'
+            : ''
+          }>
+
+        <span>
+          ทางการค้า ×2
+        </span>
+
+      </label>
+
+      <label>
+
+        รายละเอียด
+
+        <textarea
+          id="fNotes"
+          rows="6"
+          placeholder="รายละเอียดของ Base">${esc(
+            base?.notes || ''
+          )}</textarea>
+
+      </label>
+
+      <label>
+
+        รูปภาพ Base
+
+      </label>
+
+      <div class="image-box">
+
+        <div class="muted">
+
+          ${
+            base?.image_path
+            ? 'มีรูปเดิมอยู่แล้ว สามารถเลือกรูปใหม่เพื่อเปลี่ยนได้'
+            : 'เลือกรูปจากมือถือหรือคอมพิวเตอร์ได้เลย'
+          }
+
+        </div>
+
+        <input
+          id="fImage"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif">
+
+        <div
+          id="fileName"
+          class="muted">
+        </div>
+
+        ${
+          base?.image_path
+          ? `
+            <img
+              id="oldImage"
+              class="preview"
+              src="${publicImageUrl(
+                base.image_path
+              )}"
+              style="display:block"
+              alt="">
+          `
+          : ''
+        }
+
+        <img
+          id="imagePreview"
+          class="preview"
+          alt="ตัวอย่างรูป">
+
+      </div>
+
+      <div
+        style="
+          margin-top:16px;
+          font-weight:700">
+
+        🏷️ แท็ก
+
+      </div>
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:
+            repeat(2,minmax(0,1fr));
+          gap:8px;
+          margin-top:8px">
+
+        ${
+          tags
+            .map(tag=>{
+
+              const tagId =
+                Number(tag.id);
+
+              if(!Number.isFinite(tagId)){
+                return '';
+              }
+
+              return `
+
+                <label class="check">
+
+                  <input
+                    type="checkbox"
+                    class="base-tag-checkbox"
+                    data-tag-id="${tagId}"
+                    ${
+                      existingTagIds.includes(tagId)
+                      ? 'checked'
+                      : ''
+                    }>
+
+                  ${esc(tag.name)}
+
+                </label>
+
+              `;
+
+            })
+            .join('')
+
+          ||
+
+          '<div class="muted">ยังไม่มีแท็ก</div>'
+        }
+
+      </div>
+
+      <div
+        style="
+          display:flex;
+          gap:8px;
+          margin-top:18px">
+
+        <button
+          class="primary"
+          onclick="saveBase(${
+            base?.id ?? 'null'
+          })">
+
+          💾 บันทึก
+
+        </button>
+
+        <button
+          class="secondary"
+          onclick="closeModal()">
+
+          ยกเลิก
+
+        </button>
+
+      </div>
+
+    `
+  );
+
+  /*
+    ทำให้ checkbox ทางการค้า ×2
+    และ checkbox Tag "Commercial x2"
+    ด้านล่างทำงานเชื่อมกัน
+  */
+
+  const commercialCheckbox =
+    $('fCommercial');
+
+  const commercialTagCheckbox =
+    document.querySelector(
+      '#modalBody .base-tag-checkbox[data-tag-id="40"]'
+    );
+
+  if(
+    commercialCheckbox &&
+    commercialTagCheckbox
+  ){
+
+    commercialCheckbox.addEventListener(
+      'change',
+      ()=>{
+
+        commercialTagCheckbox.checked =
+          commercialCheckbox.checked;
+
+      }
+    );
+
+    commercialTagCheckbox.addEventListener(
+      'change',
+      ()=>{
+
+        commercialCheckbox.checked =
+          commercialTagCheckbox.checked;
+
+      }
+    );
+
+  }
+
+  const imageInput =
+    $('fImage');
+
+  if(imageInput){
+
+    imageInput.addEventListener(
+      'change',
+      ()=>{
+
+        const file =
+          imageInput.files[0];
+
+        $('fileName').textContent =
+          file
+          ? `เลือกรูป: ${file.name}`
+          : '';
+
+        if(!file){
+
+          $('imagePreview').style.display =
+            'none';
+
+          return;
+
+        }
+
+        $('imagePreview').src =
+          URL.createObjectURL(file);
+
+        $('imagePreview').style.display =
+          'block';
+
+      }
+    );
+
+  }
+
+}
+
+/* =========================
+   UPLOAD IMAGE
+========================= */
+
+async function uploadImage(file){
+
+  const extension =
+    (
+      file.name
+        .split('.')
+        .pop() ||
+      'jpg'
+    )
+    .toLowerCase();
+
+  const path =
+    `bases/${crypto.randomUUID()}.${extension}`;
+
+  const {
+    error
+  } =
+  await sb.storage
+    .from(IMAGE_BUCKET)
+    .upload(
+      path,
+      file,
+      {
+        upsert:false,
+        contentType:file.type
+      }
+    );
+
+  if(error){
+
+    throw new Error(
+      'อัปโหลดรูปไม่สำเร็จ: ' +
+      error.message
+    );
+
+  }
+
+  return path;
+
+}
+
+/* =========================
+   SAVE BASE
+========================= */
+
+async function saveBase(id){
+
+  const oldBase =
+    id
+    ? bases.find(
+        x =>
+        String(x.id) ===
+        String(id)
+      )
+    : null;
+
+  const name =
+    $('fName')
+      .value
+      .trim();
+
+  if(!name){
+
+    alert(
+      'กรุณาใส่ชื่อ Base'
+    );
+
+    return;
+
+  }
+
+  const ownerValue =
+    $('fOwner').value;
+
+  const commercialCheckbox =
+    $('fCommercial');
+
+  const payload = {
+
+    name:name,
+
+    owner_id:
+      ownerValue
+      ? Number(ownerValue)
+      : null,
+
+    price:
+      Number(
+        $('fPrice').value
+      ) || 0,
+
+    /*
+      ค่าใน bases ยังเก็บไว้ด้วย
+      เพื่อไม่ให้ข้อมูลเดิมเสีย
+    */
+    commercial_x2:
+      commercialCheckbox
+      ? commercialCheckbox.checked
+      : false,
+
+    max_orders:
+      Number(
+        $('fMaxOrders').value
+      ) || 0,
+
+    type:
+      $('fType').value,
+
+    notes:
+      $('fNotes')
+        .value
+        .trim(),
+
+    status:
+      $('fStatus').value
+
+  };
+
+  const file =
+    $('fImage').files[0];
+
+  try{
+
+    /* =====================
+       IMAGE
+    ===================== */
+
+    if(file){
+
+      const imagePath =
+        await uploadImage(file);
+
+      payload.image_path =
+        imagePath;
+
+    }
+
+    let baseId;
+
+    /* =====================
+       UPDATE
+    ===================== */
+
+    if(id){
+
+      const {
+        error
+      } =
+      await sb
+        .from('bases')
+        .update(payload)
+        .eq('id',id);
+
+      if(error){
+
+        throw new Error(
+          'บันทึก Base ไม่สำเร็จ: ' +
+          error.message
+        );
+
+      }
+
+      baseId =
+        Number(id);
+
+    }
+
+    /* =====================
+       INSERT
+    ===================== */
+
+    else{
+
+      const {
+        data,
+        error
+      } =
+      await sb
+        .from('bases')
+        .insert(payload)
+        .select()
+        .single();
+
+      if(error){
+
+        throw new Error(
+          'เพิ่ม Base ไม่สำเร็จ: ' +
+          error.message
+        );
+
+      }
+
+      baseId =
+        Number(data.id);
+
+    }
+
+    if(
+      !Number.isFinite(baseId)
+    ){
+
+      throw new Error(
+        'ไม่พบ ID ของ Base ที่บันทึก'
+      );
+
+    }
+
+    /* =====================
+       DELETE OLD TAG LINKS
+    ===================== */
+
+    const {
+      error:deleteError
+    } =
+    await sb
+      .from('base_tags')
+      .delete()
+      .eq(
+        'base_id',
+        baseId
+      );
+
+    if(deleteError){
+
+      throw new Error(
+        'ล้างแท็กเดิมไม่สำเร็จ: ' +
+        deleteError.message
+      );
+
+    }
+
+    /* =====================
+       COLLECT TAGS
+    ===================== */
+
+    const checkedTagCheckboxes =
+      [
+        ...document.querySelectorAll(
+          '#modalBody input.base-tag-checkbox:checked'
+        )
+      ];
+
+    /*
+      อ่าน tag_id จาก data-tag-id
+      และตรวจสอบกับ tags จริงอีกครั้ง
+    */
+
+    const selectedTagIds = [
+      ...new Set(
+        checkedTagCheckboxes
+          .map(
+            checkbox =>
+              Number(
+                checkbox.dataset.tagId
+              )
+          )
+          .filter(
+            tagId =>
+              Number.isInteger(tagId) &&
+              tagId > 0
+          )
+          .filter(
+            tagId =>
+              tags.some(
+                tag =>
+                  Number(tag.id) ===
+                  tagId
+              )
+          )
+      )
+    ];
+
+    /*
+      Commercial ×2 ด้านบน
+      ต้องสัมพันธ์กับ Tag ID 40 เสมอ
+    */
+
+    if(
+      commercialCheckbox &&
+      commercialCheckbox.checked
+    ){
+
+      if(
+        tags.some(
+          tag =>
+            Number(tag.id) ===
+            COMMERCIAL_TAG_ID
+        )
+      ){
+
+        if(
+          !selectedTagIds.includes(
+            COMMERCIAL_TAG_ID
+          )
+        ){
+
+          selectedTagIds.push(
+            COMMERCIAL_TAG_ID
+          );
+
+        }
+
+      }
+
+    }
+    else{
+
+      /*
+        ถ้าปิด Commercial ×2
+        ให้เอา Tag 40 ออก
+      */
+
+      const index =
+        selectedTagIds.indexOf(
+          COMMERCIAL_TAG_ID
+        );
+
+      if(index !== -1){
+
+        selectedTagIds.splice(
+          index,
+          1
+        );
+
+      }
+
+    }
+
+    /* =====================
+       INSERT TAG LINKS
+    ===================== */
+
+    if(
+      selectedTagIds.length > 0
+    ){
+
+      const rows =
+        selectedTagIds
+          .filter(
+            tagId =>
+              Number.isInteger(tagId) &&
+              tagId > 0
+          )
+          .map(
+            tagId => ({
+
+              base_id:baseId,
+
+              tag_id:tagId
+
+            })
+          );
+
+      /*
+        ตรวจสอบอีกครั้งก่อนส่ง
+        เพื่อไม่ให้ null / undefined
+        เข้า base_tags
+      */
+
+      const invalidRow =
+        rows.find(
+          row =>
+            !Number.isInteger(
+              row.base_id
+            ) ||
+            !Number.isInteger(
+              row.tag_id
+            )
+        );
+
+      if(invalidRow){
+
+        throw new Error(
+          'พบข้อมูลแท็กไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง'
+        );
+
+      }
+
+      const {
+        error:tagError
+      } =
+      await sb
+        .from('base_tags')
+        .insert(rows);
+
+      if(tagError){
+
+        throw new Error(
+          'บันทึกแท็กไม่สำเร็จ: ' +
+          tagError.message
+        );
+
+      }
+
+    }
+
+    closeModal();
+
+    await loadAll();
+
+    alert(
+      id
+      ? 'บันทึก Base เรียบร้อยแล้ว ♡'
+      : 'เพิ่ม Base เรียบร้อยแล้ว ♡'
+    );
+
+  }
+
+  catch(error){
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+/* =========================
+   EDIT BASE
+========================= */
+
+function editBase(id){
+
+  const base =
+    bases.find(
+      x =>
+      String(x.id) ===
+      String(id)
+    );
+
+  if(base){
+
+    showBaseForm(base);
+
+  }
+
+}
+
+/* =========================
+   TOGGLE STATUS
+========================= */
+
+async function toggleStatus(id){
+
+  const base =
+    bases.find(
+      x =>
+      String(x.id) ===
+      String(id)
+    );
+
+  if(!base){
+    return;
+  }
+
+  const nextStatus =
+    base.status === 'closed'
+    ? 'open'
+    : 'closed';
+
+  const {
+    error
+  } =
+  await sb
+    .from('bases')
+    .update({
+      status:nextStatus
+    })
+    .eq('id',id);
+
+  if(error){
+
+    alert(
+      'เปลี่ยนสถานะไม่สำเร็จ: ' +
+      error.message
+    );
+
+    return;
+
+  }
+
+  await loadAll();
+
+}
+
+/* =========================
+   DELETE BASE
+========================= */
+
+async function deleteBase(id){
+
+  if(
+    !confirm(
+      'ต้องการลบ Base นี้ถาวรหรือไม่?'
+    )
+  ){
+
+    return;
+
+  }
+
+  const {
+    error:tagError
+  } =
+  await sb
+    .from('base_tags')
+    .delete()
+    .eq('base_id',id);
+
+  if(tagError){
+
+    alert(
+      'ล้างแท็กของ Base ไม่สำเร็จ: ' +
+      tagError.message
+    );
+
+    return;
+
+  }
+
+  const {
+    error
+  } =
+  await sb
+    .from('bases')
+    .delete()
+    .eq('id',id);
+
+  if(error){
+
+    alert(
+      'ลบ Base ไม่สำเร็จ: ' +
+      error.message
+    );
+
+    return;
+
+  }
+
+  await loadAll();
+
+  alert(
+    'ลบ Base เรียบร้อยแล้ว'
+  );
+
+}
+
+/* =========================
+   RUN
+========================= */
+
+start();
+
+</script>
+
+</body>
+</html>
