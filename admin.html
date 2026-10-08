@@ -219,6 +219,7 @@ button.danger{
   gap:10px
 }
 
+/* ช่อง checkbox ทั่วไป */
 .check{
   display:flex;
   align-items:center;
@@ -227,12 +228,46 @@ button.danger{
   border:1px solid #efdde5;
   border-radius:10px;
   padding:9px;
-  font-weight:500
+  font-weight:500;
+  cursor:pointer;
+  user-select:none
 }
 
 .check input{
   width:auto;
-  margin:0
+  margin:0;
+  cursor:pointer;
+  accent-color:#df729f
+}
+
+/* Commercial ×2 */
+.commercial-check{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  background:#fff8fb;
+  border:1px solid #efdde5;
+  border-radius:12px;
+  padding:11px 12px;
+  margin-top:14px;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+  width:100%
+}
+
+.commercial-check input{
+  width:20px;
+  height:20px;
+  margin:0;
+  padding:0;
+  cursor:pointer;
+  flex:0 0 auto;
+  accent-color:#df729f;
+}
+
+.commercial-check span{
+  cursor:pointer;
 }
 
 .image-box{
@@ -317,7 +352,6 @@ button.danger{
 
 <div class="wrap">
 
-  <!-- LOGIN -->
   <div id="loginBox" class="panel">
 
     <h2>🔐 เข้าสู่ระบบ</h2>
@@ -349,8 +383,6 @@ button.danger{
 
   </div>
 
-
-  <!-- APP -->
   <div id="app" style="display:none">
 
     <div class="panel row between">
@@ -371,8 +403,6 @@ button.danger{
 
     </div>
 
-
-    <!-- TAGS -->
     <div class="panel">
 
       <div class="row between">
@@ -394,8 +424,6 @@ button.danger{
 
     </div>
 
-
-    <!-- BASES -->
     <div class="panel">
 
       <div class="row between">
@@ -421,8 +449,6 @@ button.danger{
 
 </div>
 
-
-<!-- MODAL -->
 <div
   id="modal"
   class="modal">
@@ -442,7 +468,6 @@ button.danger{
   </div>
 
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -543,12 +568,10 @@ async function start(){
       SUPABASE_KEY
     );
 
-
   const {
     data:{session}
   } =
     await sb.auth.getSession();
-
 
   if(session){
 
@@ -559,7 +582,6 @@ async function start(){
     showLogin();
 
   }
-
 
   sb.auth.onAuthStateChange(
     async (_event,session)=>{
@@ -595,7 +617,6 @@ $('loginBtn').onclick =
     const password =
       $('password').value;
 
-
     const {
       error
     } =
@@ -605,7 +626,6 @@ $('loginBtn').onclick =
         password
 
       });
-
 
     if(error){
 
@@ -687,7 +707,6 @@ async function loadAll(){
 
   ]);
 
-
   if(basesResult.error){
 
     alert(
@@ -698,7 +717,6 @@ async function loadAll(){
     return;
 
   }
-
 
   if(tagsResult.error){
 
@@ -711,7 +729,6 @@ async function loadAll(){
 
   }
 
-
   if(baseTagsResult.error){
 
     alert(
@@ -722,7 +739,6 @@ async function loadAll(){
     return;
 
   }
-
 
   if(ownersResult.error){
 
@@ -735,9 +751,7 @@ async function loadAll(){
 
   }
 
-
   const tagMap = {};
-
 
   (baseTagsResult.data || [])
     .forEach(row=>{
@@ -755,7 +769,6 @@ async function loadAll(){
 
     });
 
-
   bases =
     (basesResult.data || [])
       .map(base=>({
@@ -767,13 +780,11 @@ async function loadAll(){
 
       }));
 
-
   tags =
     tagsResult.data || [];
 
   owners =
     ownersResult.data || [];
-
 
   renderTags();
   renderBases();
@@ -868,7 +879,6 @@ async function createTag(){
       .value
       .trim();
 
-
   if(!name){
 
     alert('กรุณาใส่ชื่อแท็ก');
@@ -876,7 +886,6 @@ async function createTag(){
     return;
 
   }
-
 
   const {
     error
@@ -886,7 +895,6 @@ async function createTag(){
       .insert({
         name
       });
-
 
   if(error){
 
@@ -898,7 +906,6 @@ async function createTag(){
     return;
 
   }
-
 
   closeModal();
 
@@ -918,18 +925,15 @@ async function renameTag(id){
       x => String(x.id) === String(id)
     );
 
-
   if(!tag){
     return;
   }
-
 
   const newName =
     prompt(
       'ชื่อแท็กใหม่',
       tag.name
     );
-
 
   if(
     !newName ||
@@ -939,7 +943,6 @@ async function renameTag(id){
     return;
 
   }
-
 
   const {
     error
@@ -951,7 +954,6 @@ async function renameTag(id){
       })
       .eq('id',id);
 
-
   if(error){
 
     alert(
@@ -962,7 +964,6 @@ async function renameTag(id){
     return;
 
   }
-
 
   await loadAll();
 
@@ -985,7 +986,6 @@ async function deleteTag(id){
 
   }
 
-
   const {
     error
   } =
@@ -993,7 +993,6 @@ async function deleteTag(id){
       .from('tags')
       .delete()
       .eq('id',id);
-
 
   if(error){
 
@@ -1005,7 +1004,6 @@ async function deleteTag(id){
     return;
 
   }
-
 
   await loadAll();
 
@@ -1029,7 +1027,6 @@ function renderBases(){
         publicImageUrl(
           base.image_path
         );
-
 
       return `
 
@@ -1083,7 +1080,6 @@ function renderBases(){
 
               </div>
 
-
               <div
                 class="${
                   open
@@ -1098,7 +1094,6 @@ function renderBases(){
                 }
 
               </div>
-
 
               <div class="chips">
 
@@ -1127,7 +1122,6 @@ function renderBases(){
 
           </div>
 
-
           <div class="actions">
 
             <button
@@ -1137,7 +1131,6 @@ function renderBases(){
               ✏️ แก้ไข
 
             </button>
-
 
             <button
               class="secondary small"
@@ -1150,7 +1143,6 @@ function renderBases(){
               }
 
             </button>
-
 
             <button
               class="danger small"
@@ -1234,17 +1226,10 @@ function showBaseForm(base){
 
   const type =
     base?.type ||
-    Object.keys({
-      "chibi-single":1,
-      "chibi-pair":1,
-      "normal-single":1,
-      "normal-pair":1
-    })[0];
-
+    'chibi-single';
 
   const status =
     base?.status || 'open';
-
 
   openModal(
 
@@ -1423,20 +1408,23 @@ function showBaseForm(base){
       </label>
 
 
+      <!-- COMMERCIAL ×2 -->
       <label
-        class="check"
-        style="margin-top:14px">
+        class="commercial-check"
+        for="fCommercial">
 
         <input
           id="fCommercial"
           type="checkbox"
           ${
-            base?.commercial_x2
+            base?.commercial_x2 === true
             ? 'checked'
             : ''
           }>
 
-        Commercial ×2
+        <span>
+          ทางการค้า ×2
+        </span>
 
       </label>
 
@@ -1593,38 +1581,42 @@ function showBaseForm(base){
   );
 
 
-  $('fImage').addEventListener(
-    'change',
-    ()=>{
+  const imageInput =
+    $('fImage');
 
-      const file =
-        $('fImage').files[0];
+  if(imageInput){
 
+    imageInput.addEventListener(
+      'change',
+      ()=>{
 
-      $('fileName').textContent =
-        file
-        ? `เลือกรูป: ${file.name}`
-        : '';
+        const file =
+          imageInput.files[0];
 
+        $('fileName').textContent =
+          file
+          ? `เลือกรูป: ${file.name}`
+          : '';
 
-      if(!file){
+        if(!file){
+
+          $('imagePreview').style.display =
+            'none';
+
+          return;
+
+        }
+
+        $('imagePreview').src =
+          URL.createObjectURL(file);
 
         $('imagePreview').style.display =
-          'none';
-
-        return;
+          'block';
 
       }
+    );
 
-
-      $('imagePreview').src =
-        URL.createObjectURL(file);
-
-      $('imagePreview').style.display =
-        'block';
-
-    }
-  );
+  }
 
 }
 
@@ -1644,25 +1636,22 @@ async function uploadImage(file){
     )
     .toLowerCase();
 
-
   const path =
     `bases/${crypto.randomUUID()}.${extension}`;
-
 
   const {
     error
   } =
-    await sb.storage
-      .from(IMAGE_BUCKET)
-      .upload(
-        path,
-        file,
-        {
-          upsert:false,
-          contentType:file.type
-        }
-      );
-
+  await sb.storage
+    .from(IMAGE_BUCKET)
+    .upload(
+      path,
+      file,
+      {
+        upsert:false,
+        contentType:file.type
+      }
+    );
 
   if(error){
 
@@ -1672,7 +1661,6 @@ async function uploadImage(file){
     );
 
   }
-
 
   return path;
 
@@ -1694,12 +1682,10 @@ async function saveBase(id){
       )
     : null;
 
-
   const name =
     $('fName')
       .value
       .trim();
-
 
   if(!name){
 
@@ -1711,10 +1697,11 @@ async function saveBase(id){
 
   }
 
-
   const ownerValue =
     $('fOwner').value;
 
+  const commercialCheckbox =
+    $('fCommercial');
 
   const payload = {
 
@@ -1731,7 +1718,9 @@ async function saveBase(id){
       ) || 0,
 
     commercial_x2:
-      $('fCommercial').checked,
+      commercialCheckbox
+      ? commercialCheckbox.checked
+      : false,
 
     max_orders:
       Number(
@@ -1751,10 +1740,8 @@ async function saveBase(id){
 
   };
 
-
   const file =
     $('fImage').files[0];
-
 
   try{
 
@@ -1781,11 +1768,10 @@ async function saveBase(id){
       const {
         error
       } =
-        await sb
-          .from('bases')
-          .update(payload)
-          .eq('id',id);
-
+      await sb
+        .from('bases')
+        .update(payload)
+        .eq('id',id);
 
       if(error){
 
@@ -1795,7 +1781,6 @@ async function saveBase(id){
         );
 
       }
-
 
       baseId = id;
 
@@ -1810,12 +1795,11 @@ async function saveBase(id){
         data,
         error
       } =
-        await sb
-          .from('bases')
-          .insert(payload)
-          .select()
-          .single();
-
+      await sb
+        .from('bases')
+        .insert(payload)
+        .select()
+        .single();
 
       if(error){
 
@@ -1826,28 +1810,24 @@ async function saveBase(id){
 
       }
 
-
       baseId =
         data.id;
 
     }
 
 
-    /* =====================
-       TAGS
-    ===================== */
+    /* TAGS */
 
     const {
       error:deleteError
     } =
-      await sb
-        .from('base_tags')
-        .delete()
-        .eq(
-          'base_id',
-          baseId
-        );
-
+    await sb
+      .from('base_tags')
+      .delete()
+      .eq(
+        'base_id',
+        baseId
+      );
 
     if(deleteError){
 
@@ -1858,13 +1838,6 @@ async function saveBase(id){
 
     }
 
-
-    /*
-      สำคัญ:
-      เลือกเฉพาะ checkbox
-      ที่เป็นแท็กจริง ๆ
-      ไม่เอา Commercial ×2
-    */
 
     const selectedTagIds =
       [
@@ -1891,20 +1864,17 @@ async function saveBase(id){
           tagId => ({
 
             base_id:baseId,
-
             tag_id:tagId
 
           })
         );
 
-
       const {
         error:tagError
       } =
-        await sb
-          .from('base_tags')
-          .insert(rows);
-
+      await sb
+        .from('base_tags')
+        .insert(rows);
 
       if(tagError){
 
@@ -1921,7 +1891,6 @@ async function saveBase(id){
     closeModal();
 
     await loadAll();
-
 
     alert(
       id
@@ -1955,7 +1924,6 @@ function editBase(id){
       String(id)
     );
 
-
   if(base){
 
     showBaseForm(base);
@@ -1978,28 +1946,24 @@ async function toggleStatus(id){
       String(id)
     );
 
-
   if(!base){
     return;
   }
-
 
   const nextStatus =
     base.status === 'closed'
     ? 'open'
     : 'closed';
 
-
   const {
     error
   } =
-    await sb
-      .from('bases')
-      .update({
-        status:nextStatus
-      })
-      .eq('id',id);
-
+  await sb
+    .from('bases')
+    .update({
+      status:nextStatus
+    })
+    .eq('id',id);
 
   if(error){
 
@@ -2011,7 +1975,6 @@ async function toggleStatus(id){
     return;
 
   }
-
 
   await loadAll();
 
@@ -2034,19 +1997,13 @@ async function deleteBase(id){
 
   }
 
-
-  /*
-    ลบความสัมพันธ์แท็กก่อน
-  */
-
   const {
     error:tagError
   } =
-    await sb
-      .from('base_tags')
-      .delete()
-      .eq('base_id',id);
-
+  await sb
+    .from('base_tags')
+    .delete()
+    .eq('base_id',id);
 
   if(tagError){
 
@@ -2059,19 +2016,13 @@ async function deleteBase(id){
 
   }
 
-
-  /*
-    ลบ Base
-  */
-
   const {
     error
   } =
-    await sb
-      .from('bases')
-      .delete()
-      .eq('id',id);
-
+  await sb
+    .from('bases')
+    .delete()
+    .eq('id',id);
 
   if(error){
 
@@ -2084,9 +2035,7 @@ async function deleteBase(id){
 
   }
 
-
   await loadAll();
-
 
   alert(
     'ลบ Base เรียบร้อยแล้ว'
