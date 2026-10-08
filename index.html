@@ -1,87 +1,497 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>NIMURI — Bases ♡</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#fff7fb;
+  --white:#fff;
+  --pink:#ef9fbe;
+  --pink-strong:#df729f;
+  --line:#efd8e2;
+  --text:#40343a;
+  --muted:#9b858e;
+  --soft:#f8edf2;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-size:14px;
+}
+
+button{
+  font:inherit;
+}
+
+.page{
+  width:min(100%,1120px);
+  margin:0 auto;
+  padding:0 16px 55px;
+}
+
+header{
+  text-align:center;
+  padding:38px 18px 34px;
+}
+
+header h1{
+  margin:0;
+  font-size:29px;
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:-.6px;
+}
+
+header p{
+  margin:8px 0 0;
+  color:#a18491;
+  font-size:17px;
+}
+
+.section-title{
+  font-size:13px;
+  font-weight:700;
+  color:#8e737f;
+  margin:0 0 9px;
+}
+
+.filter-section{
+  margin:0 0 22px;
+}
+
+.pills{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.pill{
+  border:1px solid #eccbd9;
+  background:#fff;
+  color:#806773;
+  padding:9px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:.16s ease;
+}
+
+.pill:hover{
+  transform:translateY(-1px);
+}
+
+.pill.active{
+  background:#ef9fbe;
+  color:#fff;
+  border-color:#ef9fbe;
+}
+
+.base-summary{
+  background:#fff;
+  border:1px solid #efd8e2;
+  border-radius:18px;
+  padding:14px 16px;
+  margin:0 0 22px;
+  text-align:center;
+  box-shadow:0 5px 18px rgba(150,100,125,.05);
+}
+
+.base-summary-total{
+  color:#9a7585;
+  font-size:15px;
+  line-height:1.5;
+}
+
+.base-summary-status{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:3px;
+  color:#a18491;
+  font-size:13px;
+}
+
+.base-summary-status .open{
+  color:#d47f9f;
+}
+
+.base-summary-status .closed{
+  color:#a18491;
+}
+
+.count{
+  display:none;
+}
+
+.list{
+  display:grid;
+  gap:20px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #efd8e2;
+  border-radius:21px;
+  overflow:hidden;
+  box-shadow:0 7px 24px rgba(150,100,125,.08);
+}
+
+.cover{
+  position:relative;
+  min-height:180px;
+  background:#f8edf2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.cover img{
+  width:100%;
+  height:auto;
+  max-height:560px;
+  object-fit:contain;
+  display:block;
+}
+
+.placeholder{
+  padding:45px 15px;
+  text-align:center;
+  color:#b39da6;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.status{
+  position:absolute;
+  right:10px;
+  top:10px;
+  border-radius:999px;
+  padding:6px 10px;
+  background:#fff;
+  font-size:11px;
+  font-weight:800;
+  box-shadow:0 2px 8px #0001;
+  color:#d76d99;
+}
+
+.status.closed{
+  color:#777;
+}
+
+.card-body{
+  padding:17px;
+}
+
+.card h2{
+  margin:0 0 4px;
+  font-size:19px;
+  line-height:1.25;
+  font-weight:800;
+}
+
+.type-label{
+  font-size:12px;
+  color:#d47f9f;
+  margin-bottom:8px;
+}
+
+.owner{
+  margin:0;
+  color:#9a858e;
+  font-size:13px;
+}
+
+.price{
+  margin:9px 0;
+  color:#df729f;
+  font-size:18px;
+  font-weight:800;
+  line-height:1.3;
+}
+
+.details{
+  margin:8px 0 0;
+  padding-left:18px;
+  color:#65555d;
+  font-size:14px;
+  line-height:1.75;
+}
+
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+
+.tag{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:5px 9px;
+  background:#fff0f6;
+  color:#bd6289;
+  font-size:12px;
+}
+
+.empty,
+.loading{
+  text-align:center;
+  color:#9b858e;
+  padding:45px 10px;
+}
+
+.error{
+  padding:20px;
+  border-radius:18px;
+  background:#fff0f0;
+  color:#b34e4e;
+  line-height:1.6;
+}
+
+@media(max-width:600px){
+
+  .page{
+    padding:0 16px 55px;
+  }
+
+  header{
+    padding:38px 18px 34px;
+  }
+
+  header h1{
+    font-size:24px;
+  }
+
+  header p{
+    font-size:17px;
+  }
+
+  .card{
+    border-radius:21px;
+  }
+
+  .card-body{
+    padding:17px;
+  }
+
+  .card h2{
+    font-size:19px;
+  }
+
+  .price{
+    font-size:18px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<header>
+  <h1>NIMURI — Bases ♡</h1>
+  <p>Bases I draw ♡</p>
+</header>
+
+<section class="filter-section">
+
+  <h3 class="section-title">ประเภท</h3>
+
+  <div class="pills" id="typeFilters">
+
+    <button class="pill active" data-type="">
+      ทั้งหมด
+    </button>
+
+    <button class="pill" data-type="จิบิเดี่ยว">
+      จิบิเดี่ยว
+    </button>
+
+    <button class="pill" data-type="จิบิคู่">
+      จิบิคู่
+    </button>
+
+    <button class="pill" data-type="สเกลปกติ เดี่ยว">
+      สเกลปกติ เดี่ยว
+    </button>
+
+    <button class="pill" data-type="สเกลปกติ คู่">
+      สเกลปกติ คู่
+    </button>
+
+  </div>
+
+</section>
+
+<section class="filter-section">
+
+  <h3 class="section-title">สถานะรับงาน</h3>
+
+  <div class="pills" id="statusFilters">
+
+    <button class="pill active" data-status="">
+      ทั้งหมด
+    </button>
+
+    <button class="pill" data-status="open">
+      ♡ เปิดรับ
+    </button>
+
+    <button class="pill" data-status="closed">
+      ปิดรับ
+    </button>
+
+  </div>
+
+</section>
+
+<section class="base-summary" aria-live="polite">
+
+  <div class="base-summary-total">
+    ♡ Base ทั้งหมด <span id="summaryTotal">0</span> เบส
+  </div>
+
+  <div class="base-summary-status">
+
+    <span class="open">
+      ♡ เปิดรับ <span id="summaryOpen">0</span> เบส
+    </span>
+
+    <span>·</span>
+
+    <span class="closed">
+      ♡ ปิดรับ <span id="summaryClosed">0</span> เบส
+    </span>
+
+  </div>
+
+</section>
+
+<div id="count" class="count"></div>
+
+<div id="list" class="list">
+
+  <div class="loading">
+    กำลังโหลด Base ♡
+  </div>
+
+</div>
+
+</div>
+
 <script>
 
-const db=supabase.createClient(
-  "https://ncczyxjtcnchnzvrbtvy.supabase.co",
-  "sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm"
-);
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-let bases=[];
-let selectedType="";
-let selectedStatus="";
+const SUPABASE_URL =
+  "https://ncczyxjtcnchnzvrbtvy.supabase.co";
 
-const list=document.getElementById("list");
-const count=document.getElementById("count");
+const SUPABASE_KEY =
+  "sb_publishable_8mVfjFwyZmo30YTOoRL-sw_o1IJ9DWm";
 
-const summaryTotal=
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let bases = [];
+
+let selectedType = "";
+
+let selectedStatus = "";
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const list =
+  document.getElementById("list");
+
+const count =
+  document.getElementById("count");
+
+const summaryTotal =
   document.getElementById("summaryTotal");
 
-const summaryOpen=
+const summaryOpen =
   document.getElementById("summaryOpen");
 
-const summaryClosed=
+const summaryClosed =
   document.getElementById("summaryClosed");
 
 
+/* =========================================================
+   SECURITY / HTML
+========================================================= */
+
 function escapeHTML(value){
 
-  return String(value??"").replace(
+  return String(value ?? "").replace(
     /[&<>"']/g,
-    m=>({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#039;"
-    }[m])
+    function(match){
+
+      return {
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[match];
+
+    }
   );
 
 }
 
 
-/* ================================
-   สถานะ Open / Closed
-================================ */
+/* =========================================================
+   STATUS
+   อ่านจาก bases.status โดยตรง
+========================================================= */
 
-function getStatus(b){
+function getStatus(base){
 
-  const raw=String(
-    b.status ??
-    b.state ??
-    b.availability ??
-    ""
-  ).trim().toLowerCase();
-
-  if(
-    [
-      "closed",
-      "close",
-      "ปิดรับ",
-      "ไม่รับ",
-      "unavailable"
-    ].some(x=>raw.includes(x))
-  ){
-
-    return "closed";
-
-  }
+  const value =
+    String(base.status ?? "")
+      .trim()
+      .toLowerCase();
 
   if(
-    [
-      "open",
-      "opened",
-      "เปิดรับ",
-      "รับงาน",
-      "available"
-    ].some(x=>raw.includes(x))
-  ){
-
-    return "open";
-
-  }
-
-  if(
-    b.is_open===false ||
-    b.open===false
+    value === "closed" ||
+    value === "close" ||
+    value === "ปิดรับ" ||
+    value === "ไม่รับ" ||
+    value === "unavailable"
   ){
 
     return "closed";
@@ -93,193 +503,138 @@ function getStatus(b){
 }
 
 
-/* ================================
-   สรุปจำนวน
-================================ */
+/* =========================================================
+   IMAGE
+   อ่านจาก bases.image_path โดยตรง
+========================================================= */
 
-function updateSummary(){
+function imageFor(base){
 
-  let open=0;
-  let closed=0;
+  const path =
+    String(base.image_path ?? "")
+      .trim();
 
-  bases.forEach(b=>{
+  if(!path){
 
-    if(getStatus(b)==="open"){
-      open++;
-    }else{
-      closed++;
-    }
-
-  });
-
-  summaryTotal.textContent=bases.length;
-  summaryOpen.textContent=open;
-  summaryClosed.textContent=closed;
-
-}
-
-
-/* ================================
-   รูปจาก Supabase Storage
-================================ */
-
-function imageFor(b){
-
-  const path=
-    String(b.image_path||"").trim();
-
-  if(path){
-
-    const result=
-      db.storage
-        .from("base-images")
-        .getPublicUrl(path);
-
-    const publicUrl=
-      result?.data?.publicUrl;
-
-    if(publicUrl){
-
-      return publicUrl;
-
-    }
+    return "";
 
   }
 
+  const result =
+    db.storage
+      .from("base-images")
+      .getPublicUrl(path);
+
   return (
-    b.image_url ||
-    b.image ||
-    b.cover_url ||
-    "images/base-01.png"
+    result?.data?.publicUrl ||
+    ""
   );
 
 }
 
 
-/* ================================
-   ประเภท
-================================ */
+/* =========================================================
+   TYPE
+========================================================= */
 
-function typeFor(b){
+function typeFor(base){
 
   return String(
-    b.type ||
-    b.category ||
-    ""
+    base.type ?? ""
   ).trim();
 
 }
 
 
-/* ================================
-   ราคา
-================================ */
+/* =========================================================
+   PRICE
+========================================================= */
 
-function priceText(b){
+function priceText(base){
 
-  const price=
-    b.price==null
+  const price =
+    base.price == null
       ? ""
-      : b.price;
+      : base.price;
 
-  const commercial=
-    b.commercial_x2===true ||
-    String(b.commercial_x2)
-      .toLowerCase()==="true";
+  const commercial =
+    base.commercial_x2 === true ||
+    String(base.commercial_x2)
+      .toLowerCase() === "true";
 
   return `
     PRICE : ${escapeHTML(price)}B
-    · เชิงพาณิชย์ ${commercial?"×2":"×1"}
+    · เชิงพาณิชย์ ${commercial ? "×2" : "×1"}
   `;
 
 }
 
 
-/* ================================
-   รายละเอียด
-================================ */
+/* =========================================================
+   DETAILS
+========================================================= */
 
-function detailsFor(b){
+function detailsFor(base){
 
-  if(Array.isArray(b.details)){
+  const notes =
+    String(base.notes ?? "")
+      .trim();
 
-    return b.details.filter(Boolean);
+  if(!notes){
 
-  }
+    const result = [];
 
-  if(Array.isArray(b.notes)){
+    if(base.max_orders){
 
-    return b.notes.filter(Boolean);
+      result.push(
+        `1คนสั่งได้สูงสุด ${base.max_orders}งาน (ต่อรอบ)`
+      );
 
-  }
+    }
 
-  const notes=
-    String(b.notes||"").trim();
-
-  if(notes){
-
-    return notes
-      .split(/\n|•/)
-      .map(x=>x.trim())
-      .filter(Boolean);
+    return result;
 
   }
 
-  const result=[];
-
-  if(b.expressions){
-
-    result.push(
-      `มีสีหน้าให้เลือกถึง ${b.expressions} สีหน้า`
-    );
-
-  }
-
-  if(b.addons){
-
-    result.push(
-      `เพิ่มของถือ ${b.addons}`
-    );
-
-  }
-
-  if(b.max_orders){
-
-    result.push(
-      `1คนสั่งได้สูงสุด ${b.max_orders}งาน (ต่อรอบ)`
-    );
-
-  }
-
-  return result;
+  return notes
+    .split(/\n|•/)
+    .map(
+      item => item.trim()
+    )
+    .filter(Boolean);
 
 }
 
 
-/* ================================
-   ปุ่มตัวกรอง
-================================ */
+/* =========================================================
+   FILTER BUTTONS
+========================================================= */
 
-function filterButtons(){
+function updateFilterButtons(){
 
   document
-    .querySelectorAll("#typeFilters .pill")
-    .forEach(btn=>{
+    .querySelectorAll(
+      "#typeFilters .pill"
+    )
+    .forEach(button => {
 
-      btn.classList.toggle(
+      button.classList.toggle(
         "active",
-        btn.dataset.type===selectedType
+        button.dataset.type === selectedType
       );
 
     });
 
-  document
-    .querySelectorAll("#statusFilters .pill")
-    .forEach(btn=>{
 
-      btn.classList.toggle(
+  document
+    .querySelectorAll(
+      "#statusFilters .pill"
+    )
+    .forEach(button => {
+
+      button.classList.toggle(
         "active",
-        btn.dataset.status===selectedStatus
+        button.dataset.status === selectedStatus
       );
 
     });
@@ -287,115 +642,202 @@ function filterButtons(){
 }
 
 
-/* ================================
-   แสดง Base
-================================ */
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function updateSummary(){
+
+  let open = 0;
+
+  let closed = 0;
+
+  for(const base of bases){
+
+    if(getStatus(base) === "closed"){
+
+      closed++;
+
+    }else{
+
+      open++;
+
+    }
+
+  }
+
+  summaryTotal.textContent =
+    bases.length;
+
+  summaryOpen.textContent =
+    open;
+
+  summaryClosed.textContent =
+    closed;
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
 
 function render(){
 
-  filterButtons();
+  updateFilterButtons();
 
-  const result=
-    bases.filter(b=>{
+  const filtered =
+    bases.filter(base => {
 
-      const t=typeFor(b);
-      const s=getStatus(b);
+      const type =
+        typeFor(base);
 
-      const typeOK=
+      const status =
+        getStatus(base);
+
+      const typeOK =
         !selectedType ||
-        t.includes(selectedType);
+        type.includes(selectedType);
 
-      const statusOK=
+      const statusOK =
         !selectedStatus ||
-        s===selectedStatus;
+        status === selectedStatus;
 
       return typeOK && statusOK;
 
     });
 
-  count.textContent=
-    `พบ ${result.length} จาก ${bases.length} Base`;
 
-  if(!result.length){
+  count.textContent =
+    `พบ ${filtered.length} จาก ${bases.length} Base`;
 
-    list.innerHTML=
-      '<div class="empty">ไม่พบ Base ตามตัวกรองนี้ ♡</div>';
+
+  if(filtered.length === 0){
+
+    list.innerHTML =
+      `
+        <div class="empty">
+          ไม่พบ Base ตามตัวกรองนี้ ♡
+        </div>
+      `;
 
     return;
 
   }
 
-  list.innerHTML=
-    result.map(b=>{
 
-      const s=getStatus(b);
+  list.innerHTML =
+    filtered.map(base => {
 
-      const details=
-        detailsFor(b);
+      const status =
+        getStatus(base);
 
-      const tags=
-        Array.isArray(b.tags)
-          ? b.tags
+      const image =
+        imageFor(base);
+
+      const details =
+        detailsFor(base);
+
+      const tags =
+        Array.isArray(base.tags)
+          ? base.tags
           : [];
 
-      const image=
-        imageFor(b);
 
-      const title=
+      const title =
         escapeHTML(
-          b.name ||
+          base.name ||
           "ไม่มีชื่อ"
         );
 
-      const type=
+
+      const type =
         escapeHTML(
-          typeFor(b) ||
+          typeFor(base) ||
           "ไม่ระบุประเภท"
         );
 
-      const owner=
+
+      const owner =
         escapeHTML(
-          b.owner_name ||
-          b.owner ||
+          base.owner_name ||
           "ไม่ระบุ"
         );
 
-      const alt=
+
+      const alt =
         escapeHTML(
-          b.name ||
-          "Nimuri Base"
+          base.name ||
+          "NIMURI Base"
         );
 
-      return `
 
-        <article class="card">
-
-          <div class="cover">
-
+      const imageHTML =
+        image
+          ? `
             <img
               src="${escapeHTML(image)}"
               alt="${alt}"
               loading="lazy"
-              onerror="
-                this.style.display='none';
-                this.nextElementSibling.style.display='block'
-              "
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
             >
-
             <div
               class="placeholder"
               style="display:none"
             >
               ไม่สามารถโหลดรูปได้
             </div>
+          `
+          : `
+            <div class="placeholder">
+              ยังไม่มีรูป Base
+            </div>
+          `;
+
+
+      const detailsHTML =
+        details.length
+          ? `
+            <ul class="details">
+              ${details.map(item => `
+                <li>
+                  ${escapeHTML(item)}
+                </li>
+              `).join("")}
+            </ul>
+          `
+          : "";
+
+
+      const tagsHTML =
+        tags.length
+          ? `
+            <div class="tags">
+              ${tags.map(tag => `
+                <span class="tag">
+                  ${escapeHTML(tag)}
+                </span>
+              `).join("")}
+            </div>
+          `
+          : "";
+
+
+      return `
+        <article class="card">
+
+          <div class="cover">
+
+            ${imageHTML}
 
             <div
-              class="status ${s==="closed"?"closed":""}"
+              class="status ${status === "closed" ? "closed" : ""}"
             >
-              ${s==="open"?"OPEN":"CLOSED"}
+              ${status === "open" ? "OPEN" : "CLOSED"}
             </div>
 
           </div>
+
 
           <div class="card-body">
 
@@ -408,67 +850,20 @@ function render(){
             </div>
 
             <div class="owner">
-              baes: ${owner}
+              base: ${owner}
             </div>
 
             <div class="price">
-              ${priceText(b)}
+              ${priceText(base)}
             </div>
 
-            ${
-              details.length
-              ?`
+            ${detailsHTML}
 
-                <ul class="details">
-
-                  ${details
-                    .map(
-                      x=>`
-
-                        <li>
-                          ${escapeHTML(x)}
-                        </li>
-
-                      `
-                    )
-                    .join("")
-                  }
-
-                </ul>
-
-              `
-              :""
-            }
-
-            ${
-              tags.length
-              ?`
-
-                <div class="tags">
-
-                  ${tags
-                    .map(
-                      x=>`
-
-                        <span class="tag">
-                          ${escapeHTML(x)}
-                        </span>
-
-                      `
-                    )
-                    .join("")
-                  }
-
-                </div>
-
-              `
-              :""
-            }
+            ${tagsHTML}
 
           </div>
 
         </article>
-
       `;
 
     }).join("");
@@ -476,20 +871,22 @@ function render(){
 }
 
 
-/* ================================
-   กรองประเภท
-================================ */
+/* =========================================================
+   TYPE FILTER
+========================================================= */
 
 document
-  .querySelectorAll("#typeFilters .pill")
-  .forEach(btn=>{
+  .querySelectorAll(
+    "#typeFilters .pill"
+  )
+  .forEach(button => {
 
-    btn.addEventListener(
+    button.addEventListener(
       "click",
-      ()=>{
+      function(){
 
-        selectedType=
-          btn.dataset.type;
+        selectedType =
+          this.dataset.type || "";
 
         render();
 
@@ -499,20 +896,22 @@ document
   });
 
 
-/* ================================
-   กรองสถานะ
-================================ */
+/* =========================================================
+   STATUS FILTER
+========================================================= */
 
 document
-  .querySelectorAll("#statusFilters .pill")
-  .forEach(btn=>{
+  .querySelectorAll(
+    "#statusFilters .pill"
+  )
+  .forEach(button => {
 
-    btn.addEventListener(
+    button.addEventListener(
       "click",
-      ()=>{
+      function(){
 
-        selectedStatus=
-          btn.dataset.status;
+        selectedStatus =
+          this.dataset.status || "";
 
         render();
 
@@ -522,22 +921,39 @@ document
   });
 
 
-/* ================================
-   โหลดข้อมูลจาก Supabase
-================================ */
+/* =========================================================
+   LOAD
+========================================================= */
 
 async function load(){
 
-  list.innerHTML=
-    '<div class="loading">กำลังโหลด Base ♡</div>';
+  list.innerHTML =
+    `
+      <div class="loading">
+        กำลังโหลด Base ♡
+      </div>
+    `;
+
 
   /*
-    ดึงจาก bases โดยตรง
-    เพราะ status และ image_path
-    อยู่ในตารางนี้
+    ---------------------------------------------------------
+    1. อ่าน BASES โดยตรง
+
+    ตารางนี้มี:
+    id
+    name
+    owner_id
+    price
+    commercial_x2
+    max_orders
+    type
+    notes
+    status
+    image_path
+    ---------------------------------------------------------
   */
 
-  const basesResult=
+  const baseResult =
     await db
       .from("bases")
       .select(`
@@ -554,35 +970,33 @@ async function load(){
       `)
       .order(
         "id",
-        {ascending:true}
+        {
+          ascending:true
+        }
       );
 
 
-  if(basesResult.error){
+  if(baseResult.error){
 
-    console.log(
-      "bases error:",
-      basesResult.error
+    console.error(
+      "BASE ERROR:",
+      baseResult.error
     );
 
-    list.innerHTML=
+    list.innerHTML =
       `
-
         <div class="error">
 
-          โหลดข้อมูล Base ไม่สำเร็จค่ะ 🥺
+          โหลด Base ไม่สำเร็จค่ะ 🥺
 
           <br><br>
 
           ${escapeHTML(
-            basesResult.error.message
+            baseResult.error.message
           )}
 
         </div>
-
       `;
-
-    count.textContent="";
 
     return;
 
@@ -590,11 +1004,12 @@ async function load(){
 
 
   /*
-    ดึง owner และ tags
-    จาก view เดิม
+    ---------------------------------------------------------
+    2. อ่าน OWNER + TAGS จาก VIEW เดิม
+    ---------------------------------------------------------
   */
 
-  const tagsResult=
+  const metaResult =
     await db
       .from("bases_with_tags")
       .select(`
@@ -604,20 +1019,26 @@ async function load(){
       `);
 
 
-  if(tagsResult.error){
+  if(metaResult.error){
 
-    console.log(
-      "bases_with_tags error:",
-      tagsResult.error
+    console.warn(
+      "META ERROR:",
+      metaResult.error
     );
 
   }
 
 
-  const metaMap=
+  /*
+    ---------------------------------------------------------
+    3. ทำ Map เพื่อจับคู่ด้วย ID
+    ---------------------------------------------------------
+  */
+
+  const metaMap =
     new Map(
-      (tagsResult.data||[])
-        .map(row=>[
+      (metaResult.data || [])
+        .map(row => [
           row.id,
           row
         ])
@@ -625,20 +1046,21 @@ async function load(){
 
 
   /*
-    รวมข้อมูลจาก bases
-    กับ owner / tags
+    ---------------------------------------------------------
+    4. รวม BASES + OWNER + TAGS
+    ---------------------------------------------------------
   */
 
-  bases=
-    (basesResult.data||[])
-      .map(b=>{
+  bases =
+    (baseResult.data || [])
+      .map(base => {
 
-        const meta=
-          metaMap.get(b.id) || {};
+        const meta =
+          metaMap.get(base.id) || {};
 
         return {
 
-          ...b,
+          ...base,
 
           owner_name:
             meta.owner_name || "",
@@ -653,6 +1075,12 @@ async function load(){
       });
 
 
+  /*
+    ---------------------------------------------------------
+    5. แสดงผล
+    ---------------------------------------------------------
+  */
+
   updateSummary();
 
   render();
@@ -660,6 +1088,13 @@ async function load(){
 }
 
 
+/* =========================================================
+   START
+========================================================= */
+
 load();
 
 </script>
+
+</body>
+</html>
